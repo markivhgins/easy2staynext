@@ -85,10 +85,9 @@ function AuthContent() {
 
       setRequestId(data.requestId);
       setMaskedPhone(data.maskedPhone || `+91 ${cleanPhone.slice(0, 5)}*** **${cleanPhone.slice(-2)}`);
-      setDigits(['', '', '', '', '', '']);
-      if (data.devOtp) {
-        setDevOtp(data.devOtp);
-      }
+      const otpCode = data.devOtp || '123456';
+      setDevOtp(otpCode);
+      setDigits(otpCode.slice(0, 6).split(''));
       setStep('otp');
       setCountdown(60);
       setCanResend(false);
@@ -259,7 +258,7 @@ function AuthContent() {
             Enter your mobile number to receive a 6-digit one-time password (OTP).
           </p>
 
-          <label style={{ display: 'grid', gap: '8px', marginBottom: '18px' }}>
+          <label style={{ display: 'grid', gap: '8px', marginBottom: '14px' }}>
             <span style={{ fontSize: '11.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--mut)' }}>
               10-Digit Mobile Number
             </span>
@@ -288,6 +287,47 @@ function AuthContent() {
               />
             </div>
           </label>
+
+          {/* Demo Quick-Fill Shortcuts for Owner Showcase */}
+          <div style={{ marginBottom: '18px' }}>
+            <div style={{ fontSize: '11.5px', color: 'var(--mut)', marginBottom: '6px', fontWeight: 600 }}>
+              ⚡ Quick Demo Numbers:
+            </div>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => setPhone('9876543210')}
+                style={{
+                  background: phone === '9876543210' ? 'var(--navy)' : 'rgba(21, 87, 214, 0.08)',
+                  color: phone === '9876543210' ? '#fff' : 'var(--blue)',
+                  border: '1px solid rgba(21, 87, 214, 0.25)',
+                  borderRadius: '8px',
+                  padding: '6px 12px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                🏢 Owner (9876543210)
+              </button>
+              <button
+                type="button"
+                onClick={() => setPhone('9811223344')}
+                style={{
+                  background: phone === '9811223344' ? '#059669' : 'rgba(16, 185, 129, 0.08)',
+                  color: phone === '9811223344' ? '#fff' : '#059669',
+                  border: '1px solid rgba(16, 185, 129, 0.25)',
+                  borderRadius: '8px',
+                  padding: '6px 12px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                🎓 Tenant / Student (9811223344)
+              </button>
+            </div>
+          </div>
 
           {error && (
             <p className="msg err" style={{ marginBottom: '14px', fontSize: '13.5px', color: 'var(--red)' }}>
@@ -320,7 +360,7 @@ function AuthContent() {
           <h2 style={{ fontSize: 'clamp(20px, 4vw, 24px)', fontWeight: 700, color: 'var(--navy)', marginBottom: '8px' }}>
             Enter 6-Digit Code
           </h2>
-          <p style={{ fontSize: '14px', color: 'var(--mut)', marginBottom: '22px' }}>
+          <p style={{ fontSize: '14px', color: 'var(--mut)', marginBottom: '18px' }}>
             Code sent to <strong>{maskedPhone}</strong>
             <button
               type="button"
@@ -343,72 +383,71 @@ function AuthContent() {
             </button>
           </p>
 
-          {/* Test/Dev OTP Helper Banner */}
-          {devOtp && (
-            <div
-              style={{
-                background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
-                border: '1.5px solid #818CF8',
-                borderRadius: '14px',
-                padding: '12px 16px',
-                marginBottom: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '10px',
-                boxShadow: '0 4px 14px rgba(99, 102, 241, 0.15)',
-              }}
-            >
-              <div>
-                <span
-                  style={{
-                    fontSize: '11px',
-                    fontWeight: 800,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.06em',
-                    color: '#4338CA',
-                    display: 'block',
-                    marginBottom: '2px',
-                  }}
-                >
-                  ⚡ Local Demo Verification Code
-                </span>
-                <span
-                  style={{
-                    fontSize: '22px',
-                    fontWeight: 800,
-                    fontFamily: 'monospace',
-                    color: '#312E81',
-                    letterSpacing: '4px',
-                  }}
-                >
-                  {devOtp}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  const split = devOtp.split('');
-                  setDigits(split);
-                  verifyCode(devOtp);
-                }}
+          {/* Showcase Auto-Fill OTP Card */}
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
+              border: '1.5px solid #818CF8',
+              borderRadius: '16px',
+              padding: '14px 18px',
+              marginBottom: '22px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px',
+              boxShadow: '0 4px 16px rgba(99, 102, 241, 0.15)',
+            }}
+          >
+            <div>
+              <span
                 style={{
-                  background: '#4F46E5',
-                  color: '#fff',
-                  border: 0,
-                  borderRadius: '8px',
-                  padding: '9px 15px',
-                  fontSize: '12.5px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  color: '#4338CA',
+                  display: 'block',
+                  marginBottom: '2px',
                 }}
               >
-                Click to Auto-Fill &rarr;
-              </button>
+                ⚡ Showcase Demo OTP
+              </span>
+              <span
+                style={{
+                  fontSize: '24px',
+                  fontWeight: 800,
+                  fontFamily: 'monospace',
+                  color: '#312E81',
+                  letterSpacing: '4px',
+                }}
+              >
+                {devOtp || '123456'}
+              </span>
             </div>
-          )}
+            <button
+              type="button"
+              onClick={() => {
+                const code = devOtp || '123456';
+                setDigits(code.slice(0, 6).split(''));
+                verifyCode(code);
+              }}
+              style={{
+                background: '#4F46E5',
+                color: '#fff',
+                border: 0,
+                borderRadius: '10px',
+                padding: '10px 18px',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              ⚡ Auto-Fill &amp; Sign In &rarr;
+            </button>
+          </div>
 
           {/* 6 Individual Digit Boxes */}
           <div style={{ display: 'flex', gap: 'clamp(4px, 1.5vw, 8px)', justifyContent: 'center', marginBottom: '20px' }}>

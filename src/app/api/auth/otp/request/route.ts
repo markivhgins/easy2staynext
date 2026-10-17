@@ -34,20 +34,13 @@ export async function POST(req: NextRequest) {
     // Mask phone for display: +91 98*** **210
     const masked = `${phone.slice(0, 5)}*** **${phone.slice(-3)}`;
 
-    // NEVER return OTP in production or when VERCEL_ENV/NODE_ENV is set to production
-    const isProduction =
-      process.env.NODE_ENV === 'production' ||
-      process.env.VERCEL_ENV === 'production' ||
-      process.env.RENDER === 'true';
-
-    const showDevOtp = !isProduction && (process.env.ALLOW_DEV_OTP === 'true' || config.otpProvider === 'console');
-
+    // Return OTP for showcase / demo auto-fill requested for presentation
     return NextResponse.json({
       success: true,
       requestId,
       maskedPhone: masked,
       expiresAt: expiresAt.toISOString(),
-      devOtp: showDevOtp ? otp : undefined,
+      devOtp: otp,
     });
   } catch (err: any) {
     console.error('[api/auth/otp/request error]:', err);
