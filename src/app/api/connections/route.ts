@@ -3,16 +3,7 @@ import { getDb } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { ObjectId } from 'mongodb';
 import { randomBytes } from 'crypto';
-
-// Resilient in-memory store for service connection leads
-declare global {
-  // eslint-disable-next-line no-var
-  var _f2sMemoryConnections: any[] | undefined;
-}
-if (!global._f2sMemoryConnections) {
-  global._f2sMemoryConnections = [];
-}
-export const memoryConnections = global._f2sMemoryConnections;
+import { memoryConnections } from '@/lib/memoryConnections';
 
 export async function POST(req: NextRequest) {
   try {

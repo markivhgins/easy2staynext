@@ -7,7 +7,7 @@ import { AdminDraftQueue } from '@/components/admin/AdminDraftQueue';
 import { AdminEnquiryQueue } from '@/components/admin/AdminEnquiryQueue';
 import { AdminServiceQueue } from '@/components/admin/AdminServiceQueue';
 import { memoryDrafts } from '@/lib/memoryDrafts';
-import { memoryConnections } from '@/app/api/connections/route';
+import { memoryConnections } from '@/lib/memoryConnections';
 
 export const metadata = {
   title: 'Operations Desk | Find2Stay',

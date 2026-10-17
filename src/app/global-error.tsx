@@ -2,8 +2,6 @@
 
 import React from 'react';
 
-export const dynamic = 'force-dynamic';
-
 export default function GlobalError({
   reset,
 }: {
@@ -12,9 +10,6 @@ export default function GlobalError({
 }) {
   return (
     <html lang="en">
-      <head>
-        <title>Something went wrong | Find2Stay</title>
-      </head>
       <body
         style={{
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
