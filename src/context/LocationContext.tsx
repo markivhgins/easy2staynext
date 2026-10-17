@@ -15,7 +15,19 @@ interface LocationContextType {
   clearLocationMessage: () => void;
 }
 
-const LocationContext = createContext<LocationContextType | undefined>(undefined);
+const defaultLocationContext: LocationContextType = {
+  city: SUPPORTED_CITIES[0],
+  setCity: () => {},
+  selectCityByName: () => {},
+  isLocating: false,
+  detectGpsLocation: async () => null,
+  showModal: false,
+  setShowModal: () => {},
+  locationMessage: null,
+  clearLocationMessage: () => {},
+};
+
+const LocationContext = createContext<LocationContextType>(defaultLocationContext);
 
 export function LocationProvider({ children }: { children: React.ReactNode }) {
   const [city, setCityState] = useState<CityInfo>(SUPPORTED_CITIES[0]); // Default Noida
@@ -133,8 +145,5 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
 
 export function useLocation() {
   const context = useContext(LocationContext);
-  if (!context) {
-    throw new Error('useLocation must be used within a LocationProvider');
-  }
-  return context;
+  return context || defaultLocationContext;
 }

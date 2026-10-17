@@ -50,10 +50,10 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="stylesheet" href="/css/style.css" />
-        <link rel="stylesheet" href="/css/theme.css" />
-        <link rel="stylesheet" href="/css/home.css" />
-        <link rel="stylesheet" href="/css/map.css" />
+        <link key="css-style" rel="stylesheet" href="/css/style.css" />
+        <link key="css-theme" rel="stylesheet" href="/css/theme.css" />
+        <link key="css-home" rel="stylesheet" href="/css/home.css" />
+        <link key="css-map" rel="stylesheet" href="/css/map.css" />
       </head>
       <body>
         <LocationProvider>
