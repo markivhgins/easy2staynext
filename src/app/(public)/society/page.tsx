@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { searchListings } from '@/lib/listings';
 import { SearchWithMap } from '@/components/listings/SearchWithMap';
-import { PlaceAutocompleteInput } from '@/components/search/PlaceAutocompleteInput';
+import { InteractiveFilterPanel } from '@/components/listings/InteractiveFilterPanel';
 
 interface PageProps {
   searchParams: Promise<{
@@ -115,54 +115,15 @@ export default async function SocietyPage({ searchParams }: PageProps) {
       </section>
 
       <div className="wrap split">
-        <form className="filters" action="/society" method="GET">
-          <h3>Filters</h3>
-
-          <label>
-            Locality or landmark
-            <div style={{ marginTop: '4px' }}>
-              <PlaceAutocompleteInput
-                name="q"
-                defaultValue={q}
-                placeholder="Sector 93B, Sector 137, Sector 77, Sector 128..."
-                style={{
-                  background: '#fff',
-                  border: '1px solid var(--line)',
-                  padding: '4px 10px',
-                  borderRadius: '6px'
-                }}
-              />
-            </div>
-          </label>
-
-          <label>
-            Society / Enclave
-            <select name="society" defaultValue={society}>
-              <option value="">All societies</option>
-              {distinctSocieties.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label>
-            Sort by
-            <select name="sort" defaultValue={sort || ''}>
-              <option value="">Recently confirmed</option>
-              <option value="low">Rent, low to high</option>
-              <option value="high">Rent, high to low</option>
-            </select>
-          </label>
-
-          <button type="submit" className="go">
-            Apply
-          </button>
-          <Link href="/society" className="text-center block text-sm">
-            Clear all
-          </Link>
-        </form>
+        <div>
+          <InteractiveFilterPanel
+            type="society"
+            initialQuery={q}
+            initialSort={sort}
+            initialSociety={society}
+            societiesList={distinctSocieties}
+          />
+        </div>
 
         <div>
           <SearchWithMap

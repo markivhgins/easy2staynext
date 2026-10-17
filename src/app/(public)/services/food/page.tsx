@@ -108,8 +108,14 @@ export default function FoodServicePage() {
             <input
               type="date"
               name="startDate"
+              min={new Date().toISOString().slice(0, 10)}
+              defaultValue={new Date(Date.now() + 864e5).toISOString().slice(0, 10)}
+              required
               className="mt-1 w-full"
             />
+            <small style={{ display: 'block', marginTop: '4px', fontSize: '11px', color: '#64748B' }}>
+              Tiffin delivery starts from tomorrow or your chosen future date.
+            </small>
           </label>
         </ServiceIntakeForm>
       </div>

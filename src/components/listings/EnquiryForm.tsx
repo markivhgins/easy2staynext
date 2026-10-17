@@ -22,13 +22,39 @@ export const EnquiryForm: React.FC<EnquiryFormProps> = ({
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
-  // Calculate min & max datetime for visit picker
-  // Min: now + 1 hour (padded to YYYY-MM-DDTHH:mm)
-  const now = new Date(Date.now() + 60 * 60 * 1000);
-  const minDateTime = now.toISOString().slice(0, 16);
-  // Max: now + 30 days
-  const max = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-  const maxDateTime = max.toISOString().slice(0, 16);
+  // Modern Local Date & Time slot handling strictly preventing past selections
+  const getLocalDateStr = (d: Date) => {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  const now = new Date();
+  const currentHour = now.getHours();
+  const todayStr = getLocalDateStr(now);
+  const tomorrowStr = getLocalDateStr(new Date(Date.now() + 864e5));
+  const dayAfterStr = getLocalDateStr(new Date(Date.now() + 2 * 864e5));
+  const maxDateStr = getLocalDateStr(new Date(Date.now() + 30 * 864e5));
+
+  // If today is past 6 PM, default to tomorrow
+  const [selectedDate, setSelectedDate] = useState(currentHour >= 18 ? tomorrowStr : todayStr);
+  const [selectedSlotId, setSelectedSlotId] = useState('morning');
+
+  const TIME_SLOTS = [
+    { id: 'morning', label: 'Morning', timeRange: '10:00 AM – 12:00 PM', timeVal: '10:30', cutoffHour: 11 },
+    { id: 'afternoon', label: 'Afternoon', timeRange: '12:00 PM – 03:00 PM', timeVal: '14:00', cutoffHour: 14 },
+    { id: 'evening', label: 'Evening', timeRange: '03:00 PM – 06:00 PM', timeVal: '16:30', cutoffHour: 17 },
+    { id: 'late', label: 'Late Evening', timeRange: '06:00 PM – 07:45 PM', timeVal: '18:30', cutoffHour: 19 },
+  ];
+
+  // Update slot value whenever selectedDate or selectedSlotId changes
+  useEffect(() => {
+    if (kind === 'VISIT') {
+      const activeSlot = TIME_SLOTS.find((s) => s.id === selectedSlotId) || TIME_SLOTS[0];
+      setSlot(`${selectedDate}T${activeSlot.timeVal}:00`);
+    }
+  }, [selectedDate, selectedSlotId, kind]);
 
   // Auto-fill logged in user info
   useEffect(() => {
@@ -170,22 +196,143 @@ export const EnquiryForm: React.FC<EnquiryFormProps> = ({
           </label>
 
           {kind === 'VISIT' && (
-            <label style={{ display: 'block', marginBottom: '12px', fontWeight: 600, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#64748B' }}>
-              Preferred Date &amp; Time
-              <input
-                type="datetime-local"
-                value={slot}
-                min={minDateTime}
-                max={maxDateTime}
-                onChange={(e) => setSlot(e.target.value)}
-                style={{ marginTop: '4px', width: '100%', borderRadius: '6px' }}
-                aria-label="Preferred time for visit"
-                required={kind === 'VISIT'}
-              />
-              <small style={{ display: 'block', marginTop: '4px', fontSize: '11px', color: '#64748B', textTransform: 'none', fontWeight: 400 }}>
-                Visiting hours: 8:00 AM – 8:00 PM (Monday – Sunday)
-              </small>
-            </label>
+            <div style={{ marginBottom: '18px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <span style={{ fontWeight: 700, fontSize: '11.5px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B' }}>
+                  Preferred Visit Date
+                </span>
+                <span style={{ fontSize: '11px', color: '#1557D6', fontWeight: 600 }}>No past dates</span>
+              </div>
+
+              {/* Quick Date Chips */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', marginBottom: '10px' }}>
+                <button
+                  type="button"
+                  disabled={currentHour >= 18}
+                  onClick={() => setSelectedDate(todayStr)}
+                  style={{
+                    padding: '8px 4px',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    textAlign: 'center',
+                    cursor: currentHour >= 18 ? 'not-allowed' : 'pointer',
+                    opacity: currentHour >= 18 ? 0.45 : 1,
+                    border: selectedDate === todayStr ? '2px solid #1557D6' : '1px solid #E2E8F0',
+                    background: selectedDate === todayStr ? 'rgba(21, 87, 214, 0.08)' : '#fff',
+                    color: selectedDate === todayStr ? '#1557D6' : '#1E293B',
+                  }}
+                >
+                  Today
+                  <span style={{ display: 'block', fontSize: '10px', color: '#64748B', fontWeight: 400 }}>
+                    {currentHour >= 18 ? 'Closed' : 'Available'}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedDate(tomorrowStr)}
+                  style={{
+                    padding: '8px 4px',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    border: selectedDate === tomorrowStr ? '2px solid #1557D6' : '1px solid #E2E8F0',
+                    background: selectedDate === tomorrowStr ? 'rgba(21, 87, 214, 0.08)' : '#fff',
+                    color: selectedDate === tomorrowStr ? '#1557D6' : '#1E293B',
+                  }}
+                >
+                  Tomorrow
+                  <span style={{ display: 'block', fontSize: '10px', color: '#64748B', fontWeight: 400 }}>Next Day</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedDate(dayAfterStr)}
+                  style={{
+                    padding: '8px 4px',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    border: selectedDate === dayAfterStr ? '2px solid #1557D6' : '1px solid #E2E8F0',
+                    background: selectedDate === dayAfterStr ? 'rgba(21, 87, 214, 0.08)' : '#fff',
+                    color: selectedDate === dayAfterStr ? '#1557D6' : '#1E293B',
+                  }}
+                >
+                  Day After
+                  <span style={{ display: 'block', fontSize: '10px', color: '#64748B', fontWeight: 400 }}>Flexible</span>
+                </button>
+              </div>
+
+              {/* Custom Date Input strictly bounded by min=todayStr */}
+              <div style={{ marginBottom: '14px' }}>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  min={todayStr}
+                  max={maxDateStr}
+                  onChange={(e) => {
+                    if (e.target.value >= todayStr) {
+                      setSelectedDate(e.target.value);
+                    }
+                  }}
+                  style={{ width: '100%', fontSize: '13.5px', padding: '9px 12px' }}
+                />
+              </div>
+
+              {/* Time Slot Selection */}
+              <div style={{ marginBottom: '8px' }}>
+                <span style={{ fontWeight: 700, fontSize: '11.5px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B', display: 'block', marginBottom: '6px' }}>
+                  Select Time Window
+                </span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px' }}>
+                  {TIME_SLOTS.map((ts) => {
+                    const isToday = selectedDate === todayStr;
+                    const isPassed = isToday && currentHour >= ts.cutoffHour;
+                    const isSelected = selectedSlotId === ts.id && !isPassed;
+
+                    return (
+                      <button
+                        key={ts.id}
+                        type="button"
+                        disabled={isPassed}
+                        onClick={() => setSelectedSlotId(ts.id)}
+                        style={{
+                          padding: '9px 8px',
+                          borderRadius: '8px',
+                          textAlign: 'left',
+                          cursor: isPassed ? 'not-allowed' : 'pointer',
+                          opacity: isPassed ? 0.45 : 1,
+                          border: isSelected ? '2px solid #1557D6' : '1px solid #E2E8F0',
+                          background: isSelected ? 'rgba(21, 87, 214, 0.08)' : '#fff',
+                          color: isSelected ? '#1557D6' : '#1E293B',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        <div style={{ fontWeight: 700, fontSize: '12px' }}>
+                          {ts.label} {isPassed && <span style={{ color: '#EF4444', fontSize: '10px' }}>(Passed)</span>}
+                        </div>
+                        <div style={{ fontSize: '10.5px', color: '#64748B', marginTop: '2px' }}>
+                          {ts.timeRange}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Selected Slot Confirmation Tag */}
+              <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '12px', color: '#1E293B', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span>📅</span>
+                <span>
+                  <strong>{new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}</strong> • {TIME_SLOTS.find(s => s.id === selectedSlotId)?.timeRange || '10:00 AM – 12:00 PM'}
+                </span>
+              </div>
+            </div>
           )}
 
           <label style={{ display: 'block', marginBottom: '12px', fontWeight: 600, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#64748B' }}>

@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { searchListings } from '@/lib/listings';
 import { SearchWithMap } from '@/components/listings/SearchWithMap';
-import { PlaceAutocompleteInput } from '@/components/search/PlaceAutocompleteInput';
+import { InteractiveFilterPanel } from '@/components/listings/InteractiveFilterPanel';
 
 interface PageProps {
   searchParams: Promise<{
@@ -119,79 +119,17 @@ export default async function PgPage({ searchParams }: PageProps) {
       </section>
 
       <div className="wrap split">
-        <form className="filters" action="/pg" method="GET">
-          <h3>Filters</h3>
-
-          <label>
-            Locality or landmark
-            <div style={{ marginTop: '4px' }}>
-              <PlaceAutocompleteInput
-                name="q"
-                defaultValue={q}
-                placeholder="Katra, Civil Lines, Allahpur..."
-                style={{
-                  background: '#fff',
-                  border: '1px solid var(--line)',
-                  padding: '4px 10px',
-                  borderRadius: '6px'
-                }}
-              />
-            </div>
-          </label>
-
-          <label>
-            Max rent: <span>{maxRent ? `₹${maxRent.toLocaleString('en-IN')}` : 'Any'}</span>
-            <input
-              type="range"
-              name="max"
-              min="3000"
-              max="20000"
-              step="500"
-              defaultValue={maxRent || 20000}
-            />
-          </label>
-
-          <label>
-            Who it is for
-            <select name="gender" defaultValue={gender}>
-              <option value="">Any</option>
-              <option value="boys">Boys</option>
-              <option value="girls">Girls</option>
-              <option value="co-ed">Co-ed</option>
-            </select>
-          </label>
-
-          <label>
-            Sharing
-            <select name="occupancy" defaultValue={occupancy}>
-              <option value="">Any</option>
-              <option value="single">Single room</option>
-              <option value="2-share">2-share</option>
-              <option value="3-share">3-share</option>
-            </select>
-          </label>
-
-          <label className="chk">
-            <input type="checkbox" name="meals" value="1" defaultChecked={meals} />
-            Meals included
-          </label>
-
-          <label>
-            Sort by
-            <select name="sort" defaultValue={sort || ''}>
-              <option value="">Recently confirmed</option>
-              <option value="low">Rent, low to high</option>
-              <option value="high">Rent, high to low</option>
-            </select>
-          </label>
-
-          <button type="submit" className="go">
-            Apply
-          </button>
-          <Link href="/pg" className="text-center block text-sm">
-            Clear all
-          </Link>
-        </form>
+        <div>
+          <InteractiveFilterPanel
+            type="pg"
+            initialQuery={q}
+            initialMax={maxRent}
+            initialSort={sort}
+            initialGender={gender}
+            initialOccupancy={occupancy}
+            initialMeals={meals}
+          />
+        </div>
 
         <div>
           <SearchWithMap

@@ -102,9 +102,14 @@ export default function MoversServicePage() {
             <input
               type="date"
               name="date"
+              min={new Date().toISOString().slice(0, 10)}
+              defaultValue={new Date(Date.now() + 2 * 864e5).toISOString().slice(0, 10)}
               required
               className="mt-1 w-full"
             />
+            <small style={{ display: 'block', marginTop: '4px', fontSize: '11px', color: '#64748B' }}>
+              Select today or any upcoming relocation date.
+            </small>
           </label>
 
           <label className="block mb-2 text-xs font-semibold uppercase text-gray-500">

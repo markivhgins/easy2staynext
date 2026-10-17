@@ -148,9 +148,9 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="pad">
+      <section className="pad" style={{ padding: '60px 0' }}>
         <div className="wrap">
-          <div className="facts">
+          <div className="facts" style={{ borderRadius: '20px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
             <div>
               <span>Focus Geography</span>
               <b>Tier 1, Tier 2 &amp; Tier 3</b>
@@ -167,11 +167,11 @@ export default function AboutPage() {
               <small>Active verified launch city</small>
             </div>
           </div>
-          <div className="btns flex gap-4 mt-8">
-            <Link className="go" href="/pg">
-              Find a stay
+          <div style={{ marginTop: '32px', display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <Link className="go" href="/pg" style={{ padding: '13px 28px', borderRadius: '999px', fontSize: '15px', fontWeight: 700, textDecoration: 'none' }}>
+              Find a stay &rarr;
             </Link>
-            <Link className="go light bd" href="/contact">
+            <Link className="go light bd" href="/contact" style={{ padding: '13px 28px', borderRadius: '999px', fontSize: '15px', fontWeight: 600, textDecoration: 'none', background: '#fff' }}>
               Contact our team
             </Link>
           </div>

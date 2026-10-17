@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { searchListings } from '@/lib/listings';
 import { SearchWithMap } from '@/components/listings/SearchWithMap';
-import { PlaceAutocompleteInput } from '@/components/search/PlaceAutocompleteInput';
+import { InteractiveFilterPanel } from '@/components/listings/InteractiveFilterPanel';
 
 interface PageProps {
   searchParams: Promise<{
@@ -116,75 +116,16 @@ export default async function FlatsPage({ searchParams }: PageProps) {
       </section>
 
       <div className="wrap split">
-        <form className="filters" action="/flats" method="GET">
-          <h3>Filters</h3>
-
-          <label>
-            Locality or landmark
-            <div style={{ marginTop: '4px' }}>
-              <PlaceAutocompleteInput
-                name="q"
-                defaultValue={q}
-                placeholder="Sector 77, Sector 137, Indirapuram..."
-                style={{
-                  background: '#fff',
-                  border: '1px solid var(--line)',
-                  padding: '4px 10px',
-                  borderRadius: '6px'
-                }}
-              />
-            </div>
-          </label>
-
-          <label>
-            Max rent: <span>{maxRent ? `₹${maxRent.toLocaleString('en-IN')}` : 'Any'}</span>
-            <input
-              type="range"
-              name="max"
-              min="8000"
-              max="80000"
-              step="2000"
-              defaultValue={maxRent || 80000}
-            />
-          </label>
-
-          <label>
-            Size / BHK
-            <select name="bhk" defaultValue={bhk}>
-              <option value="">Any size</option>
-              <option value="1 RK">1 RK</option>
-              <option value="1 BHK">1 BHK</option>
-              <option value="2 BHK">2 BHK</option>
-              <option value="3 BHK">3 BHK</option>
-            </select>
-          </label>
-
-          <label>
-            Furnishing
-            <select name="furnishing" defaultValue={furnishing}>
-              <option value="">Any</option>
-              <option value="Unfurnished">Unfurnished</option>
-              <option value="Semi-furnished">Semi-furnished</option>
-              <option value="Fully furnished">Fully furnished</option>
-            </select>
-          </label>
-
-          <label>
-            Sort by
-            <select name="sort" defaultValue={sort || ''}>
-              <option value="">Recently confirmed</option>
-              <option value="low">Rent, low to high</option>
-              <option value="high">Rent, high to low</option>
-            </select>
-          </label>
-
-          <button type="submit" className="go">
-            Apply
-          </button>
-          <Link href="/flats" className="text-center block text-sm">
-            Clear all
-          </Link>
-        </form>
+        <div>
+          <InteractiveFilterPanel
+            type="flats"
+            initialQuery={q}
+            initialMax={maxRent}
+            initialSort={sort}
+            initialBhk={bhk}
+            initialFurnishing={furnishing}
+          />
+        </div>
 
         <div>
           <SearchWithMap

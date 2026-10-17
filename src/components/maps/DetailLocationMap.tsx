@@ -31,8 +31,23 @@ export const DetailLocationMap: React.FC<DetailLocationMapProps> = ({
       if (!mapContainerRef.current) return;
       if (mapInstanceRef.current) return;
 
-      const L = (await import('leaflet')).default;
+      // Ensure Leaflet CSS is loaded in document head
+      if (!document.getElementById('leaflet-css')) {
+        const link = document.createElement('link');
+        link.id = 'leaflet-css';
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(link);
+      }
+
+      const leafletModule: any = await import('leaflet');
+      const L = leafletModule.default || leafletModule;
       if (!isMounted || !mapContainerRef.current) return;
+
+      // Reset any prior leaflet id to avoid initialization collision
+      if ((mapContainerRef.current as any)._leaflet_id) {
+        delete (mapContainerRef.current as any)._leaflet_id;
+      }
 
       const map = L.map(mapContainerRef.current, {
         center: [lat, lon],
@@ -63,8 +78,8 @@ export const DetailLocationMap: React.FC<DetailLocationMapProps> = ({
       const pinIcon = L.divIcon({
         className: 'custom-leaflet-pin',
         html: `
-          <div class="f2s-detail-pin">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <div class="f2s-detail-pin" style="width:38px;height:38px;background:#1A4DB3;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(26,77,179,0.5);border:3px solid #fff;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;">
               <path d="M12 22s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/>
               <circle cx="12" cy="10" r="2.5"/>
             </svg>
@@ -82,6 +97,18 @@ export const DetailLocationMap: React.FC<DetailLocationMapProps> = ({
         .openPopup();
 
       mapInstanceRef.current = map;
+
+      // Trigger size invalidation after render
+      setTimeout(() => {
+        if (isMounted && mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+        }
+      }, 150);
+      setTimeout(() => {
+        if (isMounted && mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+        }
+      }, 600);
     }
 
     initMap();
@@ -89,16 +116,33 @@ export const DetailLocationMap: React.FC<DetailLocationMapProps> = ({
     return () => {
       isMounted = false;
       if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
+        try {
+          mapInstanceRef.current.remove();
+        } catch {}
         mapInstanceRef.current = null;
       }
     };
-  }, [lat, lon, locality]);
+  }, [lat, lon, locality, city]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <div className="map-container detail-map">
-        <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
+      <div
+        className="map-container detail-map"
+        style={{
+          width: '100%',
+          height: '380px',
+          minHeight: '380px',
+          borderRadius: '18px',
+          overflow: 'hidden',
+          position: 'relative',
+          background: '#eef2f9',
+          border: '1px solid var(--line)',
+        }}
+      >
+        <div
+          ref={mapContainerRef}
+          style={{ width: '100%', height: '380px', minHeight: '380px' }}
+        />
       </div>
 
       <div style={{
