@@ -18,14 +18,12 @@ interface HeaderProps {
 }
 
 const NAV_LINKS = [
-  { href: '/', label: 'Home' },
-  { href: '/pg', label: 'Find Room' },
-  { href: '/flats', label: 'Flats' },
-  { href: '/services/movers', label: 'Shifting' },
-  { href: '/services/food', label: 'Tiffin' },
+  { href: '/pg', label: 'Find a Room' },
+  { href: '/services/food', label: 'Tiffin Service' },
+  { href: '/services/movers', label: 'Shifting Service' },
   { href: '/services/water', label: 'RO Water' },
-  { href: '/list-your-property', label: 'For Owners' },
-  { href: '/about', label: 'About Us' },
+  { href: '/list-your-property', label: 'List Your Property', highlighted: true },
+  { href: '/blog', label: 'Blog' },
   { href: '/help', label: 'Help' },
 ];
 
@@ -134,9 +132,23 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
           <Link
             key={link.href}
             href={link.href}
-            className={isActive(link.href) ? 'on' : ''}
+            className={`${isActive(link.href) ? 'on' : ''} ${link.highlighted ? 'header-highlighted-btn' : ''}`}
             onClick={() => setMobileMenuOpen(false)}
+            style={
+              link.highlighted
+                ? {
+                    background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
+                    color: '#ffffff',
+                    fontWeight: 700,
+                    borderRadius: '8px',
+                    padding: '7px 14px',
+                    boxShadow: '0 2px 6px rgba(29, 78, 216, 0.25)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                  }
+                : undefined
+            }
           >
+            {link.highlighted && <span style={{ marginRight: '4px' }}>🏡</span>}
             {link.label}
           </Link>
         ))}

@@ -4,11 +4,18 @@ import React, { useState } from 'react';
 
 export interface DraftItem {
   _id: string;
+  propertyId?: string;
   title: string;
   locality: string;
+  city?: string;
   type: string;
   name: string;
   phone: string;
+  whatsapp?: string;
+  userType?: string;
+  coupleFriendly?: boolean;
+  hideExactAddress?: boolean;
+  videoUrl?: string;
   rent: number;
   status: string;
   photos?: string[];
@@ -95,6 +102,11 @@ export function AdminDraftQueue({ initialDrafts }: AdminDraftQueueProps) {
             >
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  {d.propertyId && (
+                    <span style={{ fontSize: '11px', fontFamily: 'monospace', fontWeight: 700, padding: '2px 6px', background: '#e2e8f0', color: '#334155', borderRadius: '4px' }}>
+                      {d.propertyId}
+                    </span>
+                  )}
                   <strong style={{ fontSize: '16px', color: 'var(--navy)' }}>
                     {d.title}
                   </strong>
@@ -113,7 +125,10 @@ export function AdminDraftQueue({ initialDrafts }: AdminDraftQueueProps) {
                 </div>
 
                 <div style={{ fontSize: '13px', color: 'var(--mut)', marginTop: '4px' }}>
-                  📍 {d.locality} · Type: <strong>{d.type}</strong> · Monthly Rent: <strong>₹{d.rent}</strong>
+                  📍 {d.locality} · Type: <strong>{d.type}</strong> · Rent: <strong>₹{d.rent}</strong>
+                  {d.userType && <span> · Role: <em>{d.userType}</em></span>}
+                  {d.coupleFriendly && <span style={{ color: '#be185d', fontWeight: 600 }}> · 💑 Couple-Friendly</span>}
+                  {d.hideExactAddress && <span style={{ color: '#0369a1' }}> · 🔒 Address Masked</span>}
                 </div>
 
                 <div style={{ fontSize: '13px', color: 'var(--navy)', marginTop: '4px' }}>
@@ -121,6 +136,7 @@ export function AdminDraftQueue({ initialDrafts }: AdminDraftQueueProps) {
                   <a href={`tel:${d.phone}`} style={{ color: 'var(--blue)', fontWeight: 600 }}>
                     {d.phone}
                   </a>
+                  {d.whatsapp && <span> · WA: <strong>{d.whatsapp}</strong></span>}
                 </div>
 
                 {d.photos && d.photos.length > 0 && (

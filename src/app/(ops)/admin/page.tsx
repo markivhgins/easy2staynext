@@ -140,12 +140,19 @@ export default async function AdminOpsPage() {
 
   const serializedDrafts = drafts.map((d) => ({
     _id: d._id?.toString() || Math.random().toString(),
+    propertyId: d.propertyId || `F2S-NOI-${d._id?.toString().slice(-5)}`,
     title: d.title || 'Untitled Property',
     locality: d.locality || 'Noida',
     type: d.type || 'PG',
     name: d.name || 'Owner',
     phone: d.phone || '',
+    whatsapp: d.whatsapp || '',
+    userType: d.userType || 'Individual Property Owner',
+    coupleFriendly: !!d.coupleFriendly,
+    hideExactAddress: !!d.hideExactAddress,
+    videoUrl: d.videoUrl || '',
     rent: Number(d.rent) || 0,
+    photos: Array.isArray(d.photos) ? d.photos : [],
     status: d.status || 'SUBMITTED',
     createdAt: d.createdAt ? d.createdAt.toString() : undefined,
   }));

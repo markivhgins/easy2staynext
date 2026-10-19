@@ -1,18 +1,51 @@
 export interface MemoryDraft {
   _id: string;
+  propertyId?: string;
   ownerId: string;
   name: string;
   phone: string;
+  whatsapp?: string;
+  email?: string;
+  userType?: string;
+  authorisationConfirmed?: boolean;
   title: string;
   locality: string;
   city?: string;
+  fullAddress?: string;
+  landmark?: string;
+  nearbyMetroOrCollege?: string;
+  hideExactAddress?: boolean;
+  coordinates?: [number, number];
   photos?: string[];
+  photosCategorized?: Array<{ url: string; category: string }>;
+  videoUrl?: string;
   type: string;
-  gender: string;
-  occupancy: string;
-  bhk: string;
+  gender?: string;
+  occupancy?: string;
+  bhk?: string;
+  furnishing?: string;
+  sharing?: string;
+  suitableFor?: string;
+  coupleFriendly?: boolean;
+  coupleConditions?: string;
+  bathroomType?: string;
+  kitchenAvailable?: boolean;
+  totalRooms?: number;
+  availableRooms?: number;
+  roomSize?: string;
   rent: number;
   deposit: number;
+  maintenance?: number;
+  electricityBasis?: string;
+  brokerage?: number;
+  minimumStay?: string;
+  noticePeriod?: string;
+  availableFrom?: string;
+  amenities?: string[];
+  visitorsPolicy?: string;
+  petsPolicy?: string;
+  smokingPolicy?: string;
+  houseRules?: string;
   status: string;
   availabilityStatus?: string;
   createdAt: Date;
@@ -22,6 +55,8 @@ export interface MemoryDraft {
   validUntil?: Date;
   adminNotes?: string;
   assignedVerifier?: string;
+  rejectionReason?: string;
+  qrCodeUrl?: string;
 }
 
 declare global {

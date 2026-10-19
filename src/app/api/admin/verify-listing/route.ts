@@ -101,6 +101,7 @@ export async function POST(req: NextRequest) {
             {
               $set: {
                 slug: listingSlug,
+                propertyId: draft.propertyId || `F2S-${(draft.city || 'NOI').slice(0, 3).toUpperCase()}-${Math.floor(10000 + Math.random() * 90000)}`,
                 title: draft.title,
                 locality: draft.locality || 'Noida',
                 city: draft.city || 'Noida',
