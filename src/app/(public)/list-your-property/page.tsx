@@ -36,43 +36,20 @@ const USER_TYPES = [
 export default function ListYourPropertyPage() {
   const { city, setCity } = useLocation();
 
-  // Navigation & Wizard State (3 High-Level Phases / 6 Sub-steps)
-  // Phase 1: Steps 1 & 2 (Basic Info & Property Type)
-  // Phase 2: Steps 3, 4 & 5 (Location, Rent & Facilities)
-  // Phase 3: Step 6 (Photos, Verification & Submit)
-  const [currentStep, setCurrentStep] = useState<number>(1);
+  // 3-Step Wizard Navigation State
+  // Step 1: Basic Information (Property type, Location, Rent, Contact number)
+  // Step 2: Property Details (Photos, Amenities, Room type, Deposit, Availability)
+  // Step 3: Verification & Submit (OTP, Authorisation check, Submit for review)
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
 
-  // Step 1: Owner / Partner Details
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [whatsapp, setWhatsapp] = useState('');
-  const [whatsappSameAsPhone, setWhatsappSameAsPhone] = useState(true);
-  const [email, setEmail] = useState('');
-  const [userType, setUserType] = useState('Individual Property Owner');
-  const [ownershipConfirmed, setOwnershipConfirmed] = useState(false);
-
-  // OTP Verification Simulation & Autofill for Showcase
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
-  const [otpVerified, setOtpVerified] = useState(false);
-  const [otpLoading, setOtpLoading] = useState(false);
-
-  // Step 2: Property Details
+  // --- STEP 1: Basic Information ---
+  // A. Property Type & Category
   const [title, setTitle] = useState('');
   const [type, setType] = useState('PG');
-  const [furnishing, setFurnishing] = useState('Furnished');
-  const [sharing, setSharing] = useState('Single');
-  const [suitableFor, setSuitableFor] = useState('Boys');
-  const [coupleFriendly, setCoupleFriendly] = useState(false);
-  const [coupleConditions, setCoupleConditions] = useState('');
-  const [bathroomType, setBathroomType] = useState('Attached');
-  const [kitchenAvailable, setKitchenAvailable] = useState(true);
   const [bhk, setBhk] = useState('1 BHK');
-  const [totalRooms, setTotalRooms] = useState('1');
-  const [availableRooms, setAvailableRooms] = useState('1');
-  const [roomSize, setRoomSize] = useState('');
+  const [sharing, setSharing] = useState('Single');
 
-  // Step 3: Location Details
+  // B. Location Details
   const [selectedCityId, setSelectedCityId] = useState(city.id);
   const [locality, setLocality] = useState('');
   const [fullAddress, setFullAddress] = useState('');
@@ -81,36 +58,71 @@ export default function ListYourPropertyPage() {
   const [hideExactAddress, setHideExactAddress] = useState(true);
   const [gpsCoordinates, setGpsCoordinates] = useState<[number, number]>([77.391, 28.5355]);
 
-  // Step 4: Rent & Availability
+  // C. Rent & Charges
   const [rent, setRent] = useState('');
   const [deposit, setDeposit] = useState('');
   const [maintenance, setMaintenance] = useState('0');
   const [electricityBasis, setElectricityBasis] = useState('METERED');
   const [brokerage, setBrokerage] = useState('0');
+
+  // D. Contact Number & Owner Details
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
+  const [whatsappSameAsPhone, setWhatsappSameAsPhone] = useState(true);
+  const [email, setEmail] = useState('');
+  const [userType, setUserType] = useState('Individual Property Owner');
+
+  // --- STEP 2: Property Details ---
+  // A. Room Type & Layout
+  const [furnishing, setFurnishing] = useState('Furnished');
+  const [suitableFor, setSuitableFor] = useState('Boys');
+  const [coupleFriendly, setCoupleFriendly] = useState(false);
+  const [coupleConditions, setCoupleConditions] = useState('');
+  const [bathroomType, setBathroomType] = useState('Attached');
+  const [kitchenAvailable, setKitchenAvailable] = useState(true);
+  const [totalRooms, setTotalRooms] = useState('1');
+  const [availableRooms, setAvailableRooms] = useState('1');
+  const [roomSize, setRoomSize] = useState('');
+
+  // B. Deposit, Stay Terms & Availability
   const [minimumStay, setMinimumStay] = useState('1 Month');
   const [noticePeriod, setNoticePeriod] = useState('1 Month');
   const [availableFrom, setAvailableFrom] = useState('');
   const [availabilityStatus, setAvailabilityStatus] = useState('AVAILABLE');
 
-  // Step 5: Facilities & Rules
+  // C. Amenities & Rules
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([
     'High-Speed Wi-Fi',
+    'Air Conditioner (AC)',
     'Ceiling Fan',
     'Bed & Mattress',
+    'Wardrobe / Almirah',
     'RO Drinking Water',
+    '100% Power Backup',
   ]);
   const [visitorsPolicy, setVisitorsPolicy] = useState('Allowed (Daytime)');
   const [petsPolicy, setPetsPolicy] = useState('Not Allowed');
   const [smokingPolicy, setSmokingPolicy] = useState('Strictly Prohibited');
   const [houseRules, setHouseRules] = useState('');
 
-  // Step 6: Photos, Video & Verification
+  // D. Photos & Video
   const [photos, setPhotos] = useState<string[]>([]);
   const [photosCategorized, setPhotosCategorized] = useState<Array<{ url: string; category: string }>>([]);
   const [selectedCategoryForNextPhoto, setSelectedCategoryForNextPhoto] = useState('Room');
   const [videoUrl, setVideoUrl] = useState('');
-  const [consent, setConsent] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+
+  // --- STEP 3: Verification & Submit ---
+  // A. OTP
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
+
+  // B. Authorisation Check & Declarations
+  const [ownershipConfirmed, setOwnershipConfirmed] = useState(false);
+  const [consent, setConsent] = useState(false);
 
   // Duplicate Check Alert State
   const [duplicateWarning, setDuplicateWarning] = useState<{ isDuplicate: boolean; matchedTitle?: string; matchedId?: string } | null>(null);
@@ -145,73 +157,44 @@ export default function ListYourPropertyPage() {
       .catch(() => {});
   }, []);
 
-  // Set today as min date for move-in date
   const todayDateString = new Date().toISOString().split('T')[0];
 
-  const currentCityObj = SUPPORTED_CITIES.find((c) => c.id === selectedCityId) || city;
-
-  const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const id = e.target.value;
-    setSelectedCityId(id);
-    const found = SUPPORTED_CITIES.find((c) => c.id === id);
-    if (found) {
-      setCity(found);
-      setGpsCoordinates([found.lng, found.lat]);
+  const handleCityChange = (newCityId: string) => {
+    setSelectedCityId(newCityId);
+    const target = SUPPORTED_CITIES.find((c) => c.id === newCityId);
+    if (target) {
+      setCity(target);
+      if (target.id === 'noida') setGpsCoordinates([77.391, 28.5355]);
+      else if (target.id === 'delhi') setGpsCoordinates([77.209, 28.6139]);
+      else if (target.id === 'gurgaon') setGpsCoordinates([77.0266, 28.4595]);
+      else if (target.id === 'greater-noida') setGpsCoordinates([77.503, 28.4744]);
+      else if (target.id === 'ghaziabad') setGpsCoordinates([77.4538, 28.6692]);
+      else if (target.id === 'faridabad') setGpsCoordinates([77.3178, 28.4089]);
     }
   };
 
-  // OTP Handlers
-  const handleSendOtp = () => {
-    const clean = phone.replace(/\D/g, '').slice(-10);
-    if (clean.length !== 10) {
-      alert('Please enter a valid 10-digit mobile number.');
-      return;
-    }
-    setOtpLoading(true);
-    setTimeout(() => {
-      setOtpSent(true);
-      setOtpLoading(false);
-    }, 600);
-  };
-
-  const handleAutofillOtp = () => {
-    setOtpCode('123456');
-    setOtpVerified(true);
-    setOtpSent(true);
-  };
-
-  const handleVerifyOtp = () => {
-    if (otpCode.length >= 4) {
-      setOtpVerified(true);
-    } else {
-      alert('Please enter the 6-digit OTP.');
-    }
-  };
-
-  // Toggle amenity
-  const toggleAmenity = (item: string) => {
+  const handleAmenityToggle = (amenity: string) => {
     setSelectedAmenities((prev) =>
-      prev.includes(item) ? prev.filter((a) => a !== item) : [...prev, item]
+      prev.includes(amenity) ? prev.filter((a) => a !== amenity) : [...prev, amenity]
     );
   };
 
-  // Duplicate Check Trigger
   const triggerDuplicateCheck = async () => {
-    if (!phone || (!title && !locality)) return;
+    if (!title.trim() && !fullAddress.trim()) return;
     try {
       const res = await fetch('/api/drafts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'CHECK_DUPLICATE',
-          phone,
           title,
           locality,
           fullAddress,
+          phone,
         }),
       });
       const data = await res.json();
-      if (data?.isDuplicate) {
+      if (data.isDuplicate) {
         setDuplicateWarning(data);
       } else {
         setDuplicateWarning(null);
@@ -219,68 +202,135 @@ export default function ListYourPropertyPage() {
     } catch {}
   };
 
-  // File Upload Handler (with categorized tagging)
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // OTP handlers
+  const handleSendOtp = async () => {
+    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+    if (cleanPhone.length !== 10) {
+      setStatus('error');
+      setMessage('Please enter a valid 10-digit mobile number before requesting OTP.');
+      return;
+    }
+    setOtpLoading(true);
+    setMessage('');
+    try {
+      const res = await fetch('/api/auth/otp/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: `+91${cleanPhone}` }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Failed to dispatch OTP.');
+      setOtpSent(true);
+      setStatus('idle');
+    } catch (err) {
+      setStatus('error');
+      setMessage((err as Error).message);
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleAutofillOtp = () => {
+    setOtpCode('123456');
+    setOtpVerified(true);
+    setStatus('idle');
+    setMessage('OTP autofilled & verified for showcase demonstration.');
+  };
+
+  const handleVerifyOtp = async () => {
+    if (otpCode.length < 4) {
+      setStatus('error');
+      setMessage('Enter the 6-digit code received via SMS.');
+      return;
+    }
+    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+    setOtpLoading(true);
+    try {
+      const res = await fetch('/api/auth/otp/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: `+91${cleanPhone}`, code: otpCode }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Invalid OTP code.');
+      setOtpVerified(true);
+      window.dispatchEvent(new Event('f2s-auth-change'));
+      setStatus('idle');
+    } catch (err) {
+      setStatus('error');
+      setMessage((err as Error).message);
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  // Photo handlers
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     setIsUploading(true);
-    const formData = new FormData();
-    let count = 0;
+    const newPhotos: string[] = [];
+    const newCatPhotos: Array<{ url: string; category: string }> = [];
 
     Array.from(files).forEach((file) => {
-      if (file.size > 8 * 1024 * 1024) {
-        alert(`File ${file.name} is larger than 8MB. Please choose a smaller image.`);
-        return;
-      }
-      formData.append(`file_${count}`, file);
-      count++;
-    });
-
-    if (count > 0) {
-      try {
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        const data = await res.json();
-        if (data?.urls && Array.isArray(data.urls)) {
-          const newUrls = data.urls as string[];
-          setPhotos((prev) => [...prev, ...newUrls]);
-          const newCategorized = newUrls.map((url) => ({
-            url,
-            category: selectedCategoryForNextPhoto,
-          }));
-          setPhotosCategorized((prev) => [...prev, ...newCategorized]);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
+        if (result) {
+          newPhotos.push(result);
+          newCatPhotos.push({ url: result, category: selectedCategoryForNextPhoto });
+          if (newPhotos.length === files.length) {
+            setPhotos((prev) => [...prev, ...newPhotos]);
+            setPhotosCategorized((prev) => [...prev, ...newCatPhotos]);
+            setIsUploading(false);
+          }
         }
-      } catch (err) {
-        console.warn('Upload API error, falling back to data URL:', err);
-        Array.from(files).forEach((file) => {
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            const result = event.target?.result as string;
-            if (result) {
-              setPhotos((prev) => [...prev, result]);
-              setPhotosCategorized((prev) => [
-                ...prev,
-                { url: result, category: selectedCategoryForNextPhoto },
-              ]);
-            }
-          };
-          reader.readAsDataURL(file);
-        });
-      } finally {
-        setIsUploading(false);
-        e.target.value = '';
-      }
-    } else {
-      setIsUploading(false);
-    }
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const removePhoto = (index: number) => {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
     setPhotosCategorized((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Step 1 Validation
+  const validateStep1 = () => {
+    if (!title.trim()) {
+      setStatus('error');
+      setMessage('Please enter a Property Title / Building Name.');
+      return false;
+    }
+    if (!rent || Number(rent) <= 0) {
+      setStatus('error');
+      setMessage('Please enter a valid monthly rent amount.');
+      return false;
+    }
+    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+    if (!name.trim() || cleanPhone.length !== 10) {
+      setStatus('error');
+      setMessage('Please provide your full contact name and a valid 10-digit mobile number.');
+      return false;
+    }
+    setStatus('idle');
+    setMessage('');
+    return true;
+  };
+
+  const handleNextToStep2 = () => {
+    if (validateStep1()) {
+      setCurrentStep(2);
+      document.getElementById('listing-form')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleNextToStep3 = () => {
+    setStatus('idle');
+    setMessage('');
+    setCurrentStep(3);
+    document.getElementById('listing-form')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   // Save As Draft Action
@@ -440,83 +490,56 @@ export default function ListYourPropertyPage() {
     }
   };
 
-  // Prepare data for live preview modal
   const previewData: ListingPreviewData = {
     title: title || 'Aura Stay Executive PG & Flat',
     type,
-    city: currentCityObj.name,
+    city: SUPPORTED_CITIES.find((c) => c.id === selectedCityId)?.name || 'Noida',
     locality: locality || 'Sector 62',
     fullAddress,
     hideExactAddress,
-    landmark,
-    nearbyMetroOrCollege,
-    rent: rent || 8500,
-    deposit: deposit || rent || 8500,
-    maintenance,
-    electricityBasis,
-    sharing,
     bhk,
+    sharing,
     furnishing,
     suitableFor,
-    coupleFriendly,
-    coupleConditions,
     bathroomType,
     kitchenAvailable,
+    rent: rent || '8500',
+    deposit: deposit || rent || '8500',
+    maintenance: maintenance || '0',
+    electricityBasis,
+    availableFrom: availableFrom || todayDateString,
     amenities: selectedAmenities,
-    rules: [
-      `Visitors: ${visitorsPolicy}`,
-      `Pets: ${petsPolicy}`,
-      `Smoking: ${smokingPolicy}`,
-      houseRules,
-    ].filter(Boolean),
-    photos: photos.length > 0 ? photos : ['/img/hero-stay.png'],
-    photosCategorized,
-    videoUrl,
-    noticePeriod,
-    minimumStay,
-    availableFrom: availableFrom || 'Immediate',
-    propertyId: createdPropertyId || 'F2S-PREVIEW',
+    photos,
+    ownerName: name || 'Property Partner',
+    ownerPhone: phone || '9876543210',
+    userType,
+    visitorsPolicy,
+    houseRules,
   };
+
+  const currentCityObj = SUPPORTED_CITIES.find((c) => c.id === selectedCityId) || SUPPORTED_CITIES[0];
 
   return (
     <>
-      {/* 3. Hero Banner Section */}
+      {/* Hero Header */}
       <section className="head">
         <div className="wrap">
-          <div className="hd" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
+          <div className="hd" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
             <div style={{ maxWidth: '640px' }}>
               <span className="eyebrow dk" style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Find2Stay Owner &amp; Partner Platform
+                Verified Partner Hub
               </span>
-              <h1 style={{ marginTop: '8px', fontSize: '2.4rem', fontWeight: 900, lineHeight: 1.2 }}>
-                List Your Property
-              </h1>
-              <p style={{ fontSize: '1.15rem', color: '#e0f2fe', marginTop: '8px', lineHeight: 1.5, fontWeight: 500 }}>
-                Get Genuine Tenants. Reduce Vacancy. Manage Your Listings Easily.
+              <h1 style={{ marginTop: '8px', color: '#ffffff' }}>List Your Property on Find2Stay</h1>
+              <p style={{ color: '#e0f2fe', fontSize: '1rem', lineHeight: 1.6, margin: '8px 0 20px' }}>
+                Join 500+ verified PG owners, independent landlords, and brokers in {currentCityObj.name}. Zero brokerage commissions, 180-day physical inspection seal, and authentic tenant visits.
               </p>
-
-              {/* Benefits Checklist */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '10px', marginTop: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ffffff', fontSize: '0.88rem' }}>
-                  <span style={{ color: '#38bdf8', fontWeight: 800 }}>✓</span> Zero Brokerage Direct Connections
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ffffff', fontSize: '0.88rem' }}>
-                  <span style={{ color: '#38bdf8', fontWeight: 800 }}>✓</span> Verified Student &amp; Professional Leads
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ffffff', fontSize: '0.88rem' }}>
-                  <span style={{ color: '#38bdf8', fontWeight: 800 }}>✓</span> 180-Day Physical On-Site Inspection Seal
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ffffff', fontSize: '0.88rem' }}>
-                  <span style={{ color: '#38bdf8', fontWeight: 800 }}>✓</span> Smart Availability &amp; Verified QR Desk
-                </div>
-              </div>
-
-              {/* Hero CTA Buttons */}
-              <div style={{ display: 'flex', gap: '12px', marginTop: '28px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                 <a
                   href="#listing-form"
                   className="go"
                   style={{
+                    background: '#ffffff',
+                    color: 'var(--navy)',
                     padding: '12px 24px',
                     fontSize: '0.95rem',
                     fontWeight: 700,
@@ -524,7 +547,7 @@ export default function ListYourPropertyPage() {
                     textDecoration: 'none',
                   }}
                 >
-                  🏡 List Your Property Now
+                  🏡 Start Listing Now
                 </a>
                 <a
                   href="#how-it-works-roadmap"
@@ -542,7 +565,7 @@ export default function ListYourPropertyPage() {
                     gap: '6px',
                   }}
                 >
-                  ℹ️ How It Works
+                  ℹ️ Verification Roadmap
                 </a>
               </div>
             </div>
@@ -573,7 +596,7 @@ export default function ListYourPropertyPage() {
       </section>
 
       {/* Main Content Wrap */}
-      <div className="wrap" id="listing-form" style={{ maxWidth: '1180px', margin: '36px auto 80px', padding: '0 16px' }}>
+      <div className="wrap" id="listing-form" style={{ maxWidth: '1180px', width: '100%', boxSizing: 'border-box', margin: '36px auto 80px', padding: '0 16px' }}>
         {/* Success View */}
         {status === 'success' ? (
           <div style={{ padding: '36px', background: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: '24px', textAlign: 'center', maxWidth: '680px', margin: '0 auto' }}>
@@ -596,8 +619,14 @@ export default function ListYourPropertyPage() {
             >
               Property ID: {createdPropertyId || 'F2S-REGISTERED'}
             </div>
+            <div style={{ padding: '14px', background: '#ffffff', borderRadius: '14px', border: '1px solid #bbf7d0', marginBottom: '20px', textAlign: 'left', fontSize: '0.88rem', color: '#166534', lineHeight: 1.6 }}>
+              <strong>📋 Compliance &amp; QR Code Notice:</strong>
+              <div>• Initial Status: <strong>PENDING_VERIFICATION</strong></div>
+              <div>• Our local field operations specialist will call you within 24h to coordinate the physical room audit.</div>
+              <div>• <strong>🔒 Verified QR Code Badges:</strong> As per Find2Stay platform policy, official printable QR Posters are generated exclusively for verified listings upon completion of the physical audit.</div>
+            </div>
             <p style={{ fontSize: '0.95rem', color: '#15803d', lineHeight: 1.6, margin: '0 0 24px' }}>
-              {message || 'Our local field operations specialist will connect with you to confirm authorized management and coordinate the on-site verification audit.'}
+              {message || 'Your property has been linked to your Landlord Portal where you can manage availability and track verification progress.'}
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link
@@ -632,59 +661,51 @@ export default function ListYourPropertyPage() {
           <div className="lyp-layout">
             {/* Form Column */}
             <div className="lyp-card">
-              {/* 3-Phase High-Level Progress Tracker (from handwritten note) */}
+              {/* 3-Step Wizard Navigation Tracker */}
               <div style={{ marginBottom: '28px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', color: currentStep <= 2 ? 'var(--blue)' : '#16a34a' }}>
-                    1. Basic Info &amp; Type {currentStep > 2 ? '✓' : ''}
-                  </span>
-                  <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', color: currentStep >= 3 && currentStep <= 5 ? 'var(--blue)' : currentStep > 5 ? '#16a34a' : 'var(--mut)' }}>
-                    2. Location &amp; Rent {currentStep > 5 ? '✓' : ''}
-                  </span>
-                  <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', color: currentStep === 6 ? 'var(--blue)' : 'var(--mut)' }}>
-                    3. Photos &amp; Submit
-                  </span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '14px' }}>
+                  {[
+                    { s: 1 as const, title: 'Step 1: Basic Information', desc: 'Type, Location, Rent & Contact' },
+                    { s: 2 as const, title: 'Step 2: Property Details', desc: 'Photos, Amenities, Rooms & Rules' },
+                    { s: 3 as const, title: 'Step 3: Verification & Submit', desc: 'OTP, Authorization & Review' },
+                  ].map((item) => (
+                    <button
+                      key={item.s}
+                      type="button"
+                      onClick={() => {
+                        if (item.s === 1) setCurrentStep(1);
+                        else if (item.s === 2 && validateStep1()) setCurrentStep(2);
+                        else if (item.s === 3 && validateStep1()) setCurrentStep(3);
+                      }}
+                      style={{
+                        padding: '12px 14px',
+                        borderRadius: '14px',
+                        border: `1.5px solid ${currentStep === item.s ? 'var(--blue)' : currentStep > item.s ? '#86efac' : '#e2e8f0'}`,
+                        background: currentStep === item.s ? '#eff6ff' : currentStep > item.s ? '#f0fdf4' : '#ffffff',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        boxShadow: currentStep === item.s ? '0 4px 12px rgba(22, 72, 232, 0.12)' : 'none',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <div style={{ fontSize: '0.82rem', fontWeight: 800, color: currentStep === item.s ? 'var(--blue)' : currentStep > item.s ? '#166534' : 'var(--navy)' }}>
+                        {item.title} {currentStep > item.s ? '✓' : ''}
+                      </div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--mut)', marginTop: '2px' }}>
+                        {item.desc}
+                      </div>
+                    </button>
+                  ))}
                 </div>
                 <div style={{ height: '6px', background: '#e2e8f0', borderRadius: '999px', overflow: 'hidden' }}>
                   <div
                     style={{
                       height: '100%',
                       background: 'var(--blue)',
-                      width: `${(currentStep / 6) * 100}%`,
+                      width: `${(currentStep / 3) * 100}%`,
                       transition: 'width 0.3s ease',
                     }}
                   />
-                </div>
-
-                {/* Sub-step indicator pills */}
-                <div style={{ display: 'flex', gap: '6px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
-                  {[
-                    { s: 1, label: 'Owner Details' },
-                    { s: 2, label: 'Property Details' },
-                    { s: 3, label: 'Location' },
-                    { s: 4, label: 'Rent & Terms' },
-                    { s: 5, label: 'Amenities & Rules' },
-                    { s: 6, label: 'Photos & Verification' },
-                  ].map((item) => (
-                    <button
-                      key={item.s}
-                      type="button"
-                      onClick={() => setCurrentStep(item.s)}
-                      style={{
-                        padding: '4px 10px',
-                        borderRadius: '6px',
-                        border: 'none',
-                        background: currentStep === item.s ? '#eff6ff' : '#f8fafc',
-                        color: currentStep === item.s ? 'var(--blue)' : 'var(--mut)',
-                        fontSize: '0.75rem',
-                        fontWeight: currentStep === item.s ? 800 : 500,
-                        cursor: 'pointer',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      Step {item.s}: {item.label}
-                    </button>
-                  ))}
                 </div>
               </div>
 
@@ -711,296 +732,393 @@ export default function ListYourPropertyPage() {
                 </div>
               )}
 
-              {/* STEP 1: Owner / Partner Details */}
+              {/* STEP 1: Basic Information (Property Type, Location, Rent, Contact Number) */}
               {currentStep === 1 && (
                 <div>
-                  <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 6px' }}>
-                    Step 1: Owner / Partner Details
-                  </h2>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--mut)', margin: '0 0 20px' }}>
-                    Authentic contact verification guarantees direct inquiries without agent spam.
-                  </p>
+                  <div style={{ marginBottom: '24px', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px' }}>
+                    <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 6px' }}>
+                      Step 1 — Basic Information
+                    </h2>
+                    <p style={{ fontSize: '0.86rem', color: 'var(--mut)', margin: 0 }}>
+                      Provide property category, location, monthly rent, and your direct contact details.
+                    </p>
+                  </div>
 
-                  {/* 4. Who Can List? Interactive selector */}
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '8px' }}>
-                      Who are you? (User Type)
-                    </label>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
-                      {USER_TYPES.map((u) => (
-                        <div
-                          key={u.id}
-                          onClick={() => setUserType(u.id)}
-                          style={{
-                            border: `1.5px solid ${userType === u.id ? 'var(--blue)' : '#e2e8f0'}`,
-                            borderRadius: '12px',
-                            padding: '12px',
-                            cursor: 'pointer',
-                            background: userType === u.id ? '#eff6ff' : '#ffffff',
-                            transition: 'all 0.2s ease',
-                          }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                            <span style={{ fontSize: '1.2rem' }}>{u.icon}</span>
-                            <strong style={{ fontSize: '0.85rem', color: 'var(--navy)' }}>{u.label}</strong>
-                          </div>
-                          <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{u.desc}</div>
+                  {/* 1. Property Type & Title */}
+                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 14px' }}>
+                      🏷️ 1. Property Category &amp; Name
+                    </h3>
+
+                    <div style={{ display: 'grid', gap: '14px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                          Property / Building Name *
+                        </label>
+                        <input
+                          type="text"
+                          className="in"
+                          placeholder="e.g. Royal Palms Executive Boys PG or Green Heights 2BHK"
+                          value={title}
+                          onChange={(e) => setTitle(e.target.value)}
+                          onBlur={triggerDuplicateCheck}
+                          required
+                        />
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px' }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                            Property Type *
+                          </label>
+                          <select className="in" value={type} onChange={(e) => setType(e.target.value)}>
+                            <option value="PG">PG / Paying Guest</option>
+                            <option value="Hostel">Student Hostel</option>
+                            <option value="Flat">Independent Flat / Apartment</option>
+                            <option value="1RK">1 RK Studio</option>
+                            <option value="Room">Private Room in House</option>
+                          </select>
                         </div>
-                      ))}
+
+                        {type === 'Flat' || type === 'Room' ? (
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                              Configuration (BHK)
+                            </label>
+                            <select className="in" value={bhk} onChange={(e) => setBhk(e.target.value)}>
+                              <option value="1 RK">1 RK</option>
+                              <option value="1 BHK">1 BHK</option>
+                              <option value="2 BHK">2 BHK</option>
+                              <option value="3 BHK">3 BHK</option>
+                              <option value="4+ BHK">4+ BHK</option>
+                            </select>
+                          </div>
+                        ) : (
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                              Room Sharing Type
+                            </label>
+                            <select className="in" value={sharing} onChange={(e) => setSharing(e.target.value)}>
+                              <option value="Single">Single Room / Private</option>
+                              <option value="Double">Double Sharing</option>
+                              <option value="Triple">Triple Sharing</option>
+                              <option value="Multiple">4+ Multiple Sharing</option>
+                            </select>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gap: '16px' }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                        Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        className="in"
-                        placeholder="e.g. Sunil Kumar / Sharma Properties"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                      />
-                    </div>
+                  {/* 2. Location Details */}
+                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 14px' }}>
+                      📍 2. Property Location
+                    </h3>
 
-                    {/* Mobile Number + OTP Verification */}
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                        Mobile Number (OTP Verification) *
-                      </label>
-                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                        <span style={{ padding: '10px 14px', background: '#f1f5f9', borderRadius: '10px', fontSize: '0.9rem', color: 'var(--navy)', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
-                          +91
-                        </span>
-                        <input
-                          type="tel"
-                          className="in"
-                          placeholder="9876543210"
-                          maxLength={10}
-                          value={phone}
-                          onChange={(e) => {
-                            setPhone(e.target.value.replace(/\D/g, ''));
-                            setOtpVerified(false);
-                          }}
-                          required
-                          style={{ flex: 1, minWidth: '160px' }}
-                        />
-                        {!otpVerified ? (
-                          <button
-                            type="button"
-                            onClick={handleSendOtp}
-                            disabled={otpLoading || phone.length !== 10}
-                            style={{
-                              padding: '10px 16px',
-                              borderRadius: '10px',
-                              background: '#eff6ff',
-                              border: '1px solid #bfdbfe',
-                              color: 'var(--blue)',
-                              fontWeight: 700,
-                              fontSize: '0.82rem',
-                              cursor: 'pointer',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {otpLoading ? 'Sending...' : otpSent ? 'Resend OTP' : 'Send OTP'}
-                          </button>
-                        ) : (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '10px 14px', background: '#dcfce7', color: '#166534', borderRadius: '10px', fontSize: '0.82rem', fontWeight: 800 }}>
-                            ✓ Verified
-                          </span>
-                        )}
+                    <div style={{ display: 'grid', gap: '14px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px' }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                            Target City *
+                          </label>
+                          <select className="in" value={selectedCityId} onChange={(e) => handleCityChange(e.target.value)}>
+                            {SUPPORTED_CITIES.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                {c.name} ({c.state})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                            Sector / Locality *
+                          </label>
+                          <input
+                            type="text"
+                            className="in"
+                            placeholder="e.g. Sector 62, Knowledge Park, Saket"
+                            value={locality}
+                            onChange={(e) => setLocality(e.target.value)}
+                            onBlur={triggerDuplicateCheck}
+                            required
+                          />
+                        </div>
                       </div>
 
-                      {/* OTP Box & Autofill for Showcase */}
-                      {otpSent && !otpVerified && (
-                        <div style={{ marginTop: '12px', padding: '12px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #cbd5e1' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                            <input
-                              type="text"
-                              className="in"
-                              placeholder="Enter 6-digit OTP"
-                              maxLength={6}
-                              value={otpCode}
-                              onChange={(e) => setOtpCode(e.target.value)}
-                              style={{ width: '160px' }}
-                            />
-                            <button
-                              type="button"
-                              onClick={handleVerifyOtp}
-                              className="go"
-                              style={{ padding: '8px 16px', fontSize: '0.82rem', borderRadius: '8px' }}
-                            >
-                              Verify OTP
-                            </button>
-                            <button
-                              type="button"
-                              onClick={handleAutofillOtp}
-                              style={{
-                                padding: '8px 12px',
-                                fontSize: '0.8rem',
-                                borderRadius: '8px',
-                                background: '#fef3c7',
-                                border: '1px solid #fde68a',
-                                color: '#b45309',
-                                fontWeight: 700,
-                                cursor: 'pointer',
-                              }}
-                            >
-                              ⚡ Autofill Demo OTP (123456)
-                            </button>
-                          </div>
-                          <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '6px' }}>
-                            Use <strong>123456</strong> or click Autofill for instant demo verification.
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                          Full Street Address *
+                        </label>
+                        <input
+                          type="text"
+                          className="in"
+                          placeholder="Plot / House No, Street, Block, Society Name"
+                          value={fullAddress}
+                          onChange={(e) => setFullAddress(e.target.value)}
+                          onBlur={triggerDuplicateCheck}
+                          required
+                        />
+                      </div>
 
-                    {/* WhatsApp Checkbox & Input */}
-                    <div>
-                      <label className="chk-row" style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: 'var(--navy)', cursor: 'pointer' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px' }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                            Nearby Landmark
+                          </label>
+                          <input
+                            type="text"
+                            className="in"
+                            placeholder="e.g. Near Fortis Hospital / Dominos"
+                            value={landmark}
+                            onChange={(e) => setLandmark(e.target.value)}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                            Nearby Metro / College / Hub
+                          </label>
+                          <input
+                            type="text"
+                            className="in"
+                            placeholder="e.g. 500m from Sector 62 Metro"
+                            value={nearbyMetroOrCollege}
+                            onChange={(e) => setNearbyMetroOrCollege(e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Public Address Privacy Toggle */}
+                      <label className="chk-row" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: '#334155', cursor: 'pointer', marginTop: '4px' }}>
                         <input
                           type="checkbox"
-                          style={{ width: '18px', height: '18px', flexShrink: 0, margin: 0, accentColor: '#1d5bd8' }}
+                          checked={hideExactAddress}
+                          onChange={(e) => setHideExactAddress(e.target.checked)}
+                        />
+                        <span>🔒 Mask exact house/flat number from public search (revealed to tenant only after visit confirmation)</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* 3. Rent & Charges */}
+                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 14px' }}>
+                      💰 3. Rent &amp; Charges
+                    </h3>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                          Monthly Rent (₹) *
+                        </label>
+                        <input
+                          type="number"
+                          className="in"
+                          placeholder="e.g. 8500"
+                          value={rent}
+                          onChange={(e) => setRent(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                          Security Deposit (₹)
+                        </label>
+                        <input
+                          type="number"
+                          className="in"
+                          placeholder="Default: 1 Month Rent"
+                          value={deposit}
+                          onChange={(e) => setDeposit(e.target.value)}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                          Electricity &amp; Water
+                        </label>
+                        <select className="in" value={electricityBasis} onChange={(e) => setElectricityBasis(e.target.value)}>
+                          <option value="METERED">Sub-metered as per usage</option>
+                          <option value="INCLUDED">Included in Monthly Rent</option>
+                          <option value="FIXED">Fixed Monthly Charge</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                          Brokerage (₹)
+                        </label>
+                        <input
+                          type="text"
+                          className="in"
+                          placeholder="0 (Zero Brokerage)"
+                          value={brokerage}
+                          onChange={(e) => setBrokerage(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 4. Contact Number & Partner Details */}
+                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 14px' }}>
+                      👤 4. Contact Number &amp; Partner Details
+                    </h3>
+
+                    {/* Who are you? */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '8px' }}>
+                        Who are you? (User Type)
+                      </label>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 175px), 1fr))', gap: '10px' }}>
+                        {USER_TYPES.map((u) => (
+                          <div
+                            key={u.id}
+                            onClick={() => setUserType(u.id)}
+                            style={{
+                              border: `1.5px solid ${userType === u.id ? 'var(--blue)' : '#e2e8f0'}`,
+                              borderRadius: '12px',
+                              padding: '12px',
+                              cursor: 'pointer',
+                              background: userType === u.id ? '#eff6ff' : '#ffffff',
+                              transition: 'all 0.2s ease',
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                              <span style={{ fontSize: '1.2rem' }}>{u.icon}</span>
+                              <strong style={{ fontSize: '0.85rem', color: 'var(--navy)' }}>{u.label}</strong>
+                            </div>
+                            <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{u.desc}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gap: '14px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                          Full Name *
+                        </label>
+                        <input
+                          type="text"
+                          className="in"
+                          placeholder="e.g. Sunil Kumar / Sharma Properties"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px' }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                            Mobile Number *
+                          </label>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <span style={{ padding: '11px 12px', background: '#e2e8f0', borderRadius: '8px', fontWeight: 700, fontSize: '0.88rem', color: 'var(--navy)' }}>
+                              +91
+                            </span>
+                            <input
+                              type="tel"
+                              className="in"
+                              placeholder="9876543210"
+                              value={phone}
+                              maxLength={10}
+                              onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                            Email Address (Optional)
+                          </label>
+                          <input
+                            type="email"
+                            className="in"
+                            placeholder="partner@find2stay.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      <label className="chk-row" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: '#334155', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
                           checked={whatsappSameAsPhone}
                           onChange={(e) => setWhatsappSameAsPhone(e.target.checked)}
                         />
                         <span>WhatsApp number is the same as mobile number</span>
                       </label>
-                      {!whatsappSameAsPhone && (
-                        <div style={{ marginTop: '8px' }}>
-                          <input
-                            type="tel"
-                            className="in"
-                            placeholder="WhatsApp Number (e.g. 9811223344)"
-                            value={whatsapp}
-                            onChange={(e) => setWhatsapp(e.target.value.replace(/\D/g, ''))}
-                          />
-                        </div>
-                      )}
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                        Email Address (Optional)
-                      </label>
-                      <input
-                        type="email"
-                        className="in"
-                        placeholder="owner@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                    </div>
-
-                    {/* Ownership / Authorization Declaration */}
-                    <div style={{ padding: '14px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                      <label className="chk-row" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.85rem', color: '#334155', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          style={{ width: '18px', height: '18px', flexShrink: 0, margin: '3px 0 0 0', accentColor: '#1d5bd8' }}
-                          checked={ownershipConfirmed}
-                          onChange={(e) => setOwnershipConfirmed(e.target.checked)}
-                        />
-                        <span>
-                          <strong>Authorization Declaration:</strong> I confirm that I own this property or am officially authorized by the owner to manage, list, and schedule tenant visits on Find2Stay.
-                        </span>
-                      </label>
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
+                  {/* Navigation Buttons for Step 1 */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginTop: '24px' }}>
                     <button
                       type="button"
-                      onClick={() => {
-                        if (!name.trim() || phone.length !== 10) {
-                          alert('Please enter your full name and 10-digit mobile number.');
-                          return;
-                        }
-                        setCurrentStep(2);
+                      onClick={handleSaveDraft}
+                      style={{
+                        padding: '11px 20px',
+                        borderRadius: '10px',
+                        background: '#f8fafc',
+                        border: '1.5px solid #cbd5e1',
+                        color: 'var(--navy)',
+                        fontWeight: 700,
+                        fontSize: '0.88rem',
+                        cursor: 'pointer',
                       }}
-                      className="go"
-                      style={{ padding: '11px 24px', borderRadius: '10px', fontSize: '0.9rem', fontWeight: 700 }}
                     >
-                      Next: Property Details →
+                      📄 Save Draft
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleNextToStep2}
+                      className="go"
+                      style={{
+                        padding: '12px 28px',
+                        borderRadius: '12px',
+                        fontWeight: 800,
+                        fontSize: '0.92rem',
+                      }}
+                    >
+                      Next: Step 2 — Property Details →
                     </button>
                   </div>
+
+                  {status === 'error' && (
+                    <div style={{ marginTop: '16px', padding: '12px 16px', background: '#fee2e2', color: '#991b1b', borderRadius: '10px', fontSize: '0.85rem' }}>
+                      {message}
+                    </div>
+                  )}
                 </div>
               )}
 
-              {/* STEP 2: Property Details */}
+              {/* STEP 2: Property Details (Photos, Amenities, Room type, Deposit, Availability) */}
               {currentStep === 2 && (
                 <div>
-                  <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 6px' }}>
-                    Step 2: Property Type &amp; Setup
-                  </h2>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--mut)', margin: '0 0 20px' }}>
-                    Define accommodation type, room structure, sharing options, and house suitability.
-                  </p>
+                  <div style={{ marginBottom: '24px', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px' }}>
+                    <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 6px' }}>
+                      Step 2 — Property Details &amp; Amenities
+                    </h2>
+                    <p style={{ fontSize: '0.86rem', color: 'var(--mut)', margin: 0 }}>
+                      Furnishing, room facilities, move-in availability, verified amenities, and room photos.
+                    </p>
+                  </div>
 
-                  <div style={{ display: 'grid', gap: '16px' }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                        Property Title / Name *
-                      </label>
-                      <input
-                        type="text"
-                        className="in"
-                        placeholder="e.g. Aura Stay Executive Boys PG or Silicon City 2BHK High-Rise"
-                        value={title}
-                        onChange={(e) => {
-                          setTitle(e.target.value);
-                          triggerDuplicateCheck();
-                        }}
-                        required
-                      />
-                    </div>
+                  {/* 1. Room Type & Layout */}
+                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 14px' }}>
+                      🛏️ 1. Room Type &amp; Specifications
+                    </h3>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Property Category *
-                        </label>
-                        <select className="in" value={type} onChange={(e) => setType(e.target.value)}>
-                          <option value="PG">PG / Paying Guest</option>
-                          <option value="Hostel">Student Hostel</option>
-                          <option value="Flat">Independent Flat / Apartment</option>
-                          <option value="1RK">1 RK Studio</option>
-                          <option value="Room">Private Room in House</option>
-                        </select>
-                      </div>
-
-                      {type === 'Flat' || type === 'Room' ? (
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                            Configuration (BHK)
-                          </label>
-                          <select className="in" value={bhk} onChange={(e) => setBhk(e.target.value)}>
-                            <option value="1 RK">1 RK</option>
-                            <option value="1 BHK">1 BHK</option>
-                            <option value="2 BHK">2 BHK</option>
-                            <option value="3 BHK">3 BHK</option>
-                            <option value="4+ BHK">4+ BHK</option>
-                          </select>
-                        </div>
-                      ) : (
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                            Sharing Type
-                          </label>
-                          <select className="in" value={sharing} onChange={(e) => setSharing(e.target.value)}>
-                            <option value="Single">Single Room / Private</option>
-                            <option value="Double">Double Sharing</option>
-                            <option value="Triple">Triple Sharing</option>
-                            <option value="Multiple">4+ Multiple Sharing</option>
-                          </select>
-                        </div>
-                      )}
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px', marginBottom: '14px' }}>
                       <div>
                         <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
                           Furnishing Status
@@ -1023,12 +1141,10 @@ export default function ListYourPropertyPage() {
                           <option value="Family">Family Friendly</option>
                         </select>
                       </div>
-                    </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
                       <div>
                         <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Bathroom Type
+                          Washroom / Bathroom
                         </label>
                         <select className="in" value={bathroomType} onChange={(e) => setBathroomType(e.target.value)}>
                           <option value="Attached">Attached Private Washroom</option>
@@ -1038,328 +1154,78 @@ export default function ListYourPropertyPage() {
 
                       <div>
                         <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Kitchen Facility
+                          Kitchen Access
                         </label>
                         <select className="in" value={kitchenAvailable ? 'yes' : 'no'} onChange={(e) => setKitchenAvailable(e.target.value === 'yes')}>
-                          <option value="yes">Kitchen Available / Cooking Allowed</option>
-                          <option value="no">No Kitchen / Meals Provided</option>
+                          <option value="yes">Available / Self-Cooking Allowed</option>
+                          <option value="no">Not Available (Tiffin Only)</option>
                         </select>
                       </div>
                     </div>
 
-                    {/* Couple-friendly toggle & conditions (from handwritten note) */}
-                    <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                      <label className="chk-row" style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          style={{ width: '18px', height: '18px', flexShrink: 0, margin: 0, accentColor: '#1d5bd8' }}
-                          checked={coupleFriendly}
-                          onChange={(e) => setCoupleFriendly(e.target.checked)}
-                        />
-                        <span>💑 Couple-Friendly Property</span>
-                      </label>
-                      {coupleFriendly && (
-                        <div style={{ marginTop: '10px' }}>
-                          <input
-                            type="text"
-                            className="in"
-                            placeholder="Specify clear conditions (e.g. Valid government ID proof required)"
-                            value={coupleConditions}
-                            onChange={(e) => setCoupleConditions(e.target.value)}
-                          />
-                        </div>
-                      )}
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px' }}>
                       <div>
                         <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Total Number of Rooms / Units
+                          Available Rooms / Beds
                         </label>
                         <input
                           type="number"
-                          min="1"
                           className="in"
+                          min="1"
+                          value={availableRooms}
+                          onChange={(e) => setAvailableRooms(e.target.value)}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                          Total Rooms in Property
+                        </label>
+                        <input
+                          type="number"
+                          className="in"
+                          min="1"
                           value={totalRooms}
                           onChange={(e) => setTotalRooms(e.target.value)}
                         />
                       </div>
+
                       <div>
                         <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Room Size (Sq Ft, Optional)
+                          Room Size (Sq. Ft - Optional)
                         </label>
                         <input
                           type="text"
                           className="in"
-                          placeholder="e.g. 150 sq ft"
+                          placeholder="e.g. 150 sq.ft"
                           value={roomSize}
                           onChange={(e) => setRoomSize(e.target.value)}
                         />
                       </div>
                     </div>
-                  </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '24px' }}>
-                    <button
-                      type="button"
-                      onClick={() => setCurrentStep(1)}
-                      style={{ padding: '10px 18px', borderRadius: '10px', background: '#f1f5f9', border: '1px solid #cbd5e1', cursor: 'pointer' }}
-                    >
-                      ← Back
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!title.trim()) {
-                          alert('Please enter a property title.');
-                          return;
-                        }
-                        setCurrentStep(3);
-                      }}
-                      className="go"
-                      style={{ padding: '11px 24px', borderRadius: '10px', fontSize: '0.9rem', fontWeight: 700 }}
-                    >
-                      Next: Location →
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* STEP 3: Location Details */}
-              {currentStep === 3 && (
-                <div>
-                  <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 6px' }}>
-                    Step 3: Location &amp; Landmark
-                  </h2>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--mut)', margin: '0 0 20px' }}>
-                    Help students and working professionals locate your property easily.
-                  </p>
-
-                  <div style={{ display: 'grid', gap: '16px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          City *
-                        </label>
-                        <select className="in" value={selectedCityId} onChange={handleCityChange}>
-                          {SUPPORTED_CITIES.map((c) => (
-                            <option key={c.id} value={c.id}>
-                              {c.name} ({c.state})
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Locality / Sector *
-                        </label>
-                        <input
-                          type="text"
-                          className="in"
-                          placeholder="e.g. Sector 62 / Civil Lines / Katra"
-                          value={locality}
-                          onChange={(e) => {
-                            setLocality(e.target.value);
-                            triggerDuplicateCheck();
-                          }}
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                        Full Street Address *
-                      </label>
-                      <textarea
-                        className="in"
-                        rows={2}
-                        placeholder="e.g. C-25, Block C, Phase 2, Near Electronic City Metro"
-                        value={fullAddress}
-                        onChange={(e) => {
-                          setFullAddress(e.target.value);
-                          triggerDuplicateCheck();
-                        }}
-                        required
-                      />
-                    </div>
-
-                    {/* Public Display Privacy Control Toggle (Handwritten note requirement) */}
-                    <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                      <label className="chk-row" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.85rem', color: 'var(--navy)', cursor: 'pointer' }}>
+                    <div style={{ marginTop: '14px' }}>
+                      <label className="chk-row" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: '#334155', cursor: 'pointer' }}>
                         <input
                           type="checkbox"
-                          style={{ width: '18px', height: '18px', flexShrink: 0, margin: '2px 0 0 0', accentColor: '#1d5bd8' }}
-                          checked={hideExactAddress}
-                          onChange={(e) => setHideExactAddress(e.target.checked)}
+                          checked={coupleFriendly}
+                          onChange={(e) => setCoupleFriendly(e.target.checked)}
                         />
-                        <div>
-                          <strong>Privacy Protection:</strong> Hide exact door/building number until visit confirmation.
-                          <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '2px' }}>
-                            Seekers will see the locality and approximate vicinity on public maps. The exact building unit is only shared once an in-person visit is verified.
-                          </div>
-                        </div>
+                        <span>Couple Friendly allowed (married/unmarried with valid government IDs)</span>
                       </label>
                     </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Nearby Landmark
-                        </label>
-                        <input
-                          type="text"
-                          className="in"
-                          placeholder="e.g. Opp. Fortis Hospital / Near ICICI Bank"
-                          value={landmark}
-                          onChange={(e) => setLandmark(e.target.value)}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Nearby Metro / Office / College
-                        </label>
-                        <input
-                          type="text"
-                          className="in"
-                          placeholder="e.g. 400m from Sector 62 Metro / SRM Campus"
-                          value={nearbyMetroOrCollege}
-                          onChange={(e) => setNearbyMetroOrCollege(e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    {/* GPS Location Pin display */}
-                    <div style={{ padding: '12px', background: '#f1f5f9', borderRadius: '10px', fontSize: '0.82rem', color: '#475569' }}>
-                      📍 <strong>Map Pin Coordinates:</strong> Lat: {gpsCoordinates[1].toFixed(4)}, Lng: {gpsCoordinates[0].toFixed(4)} ({currentCityObj.name})
-                    </div>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '24px' }}>
-                    <button
-                      type="button"
-                      onClick={() => setCurrentStep(2)}
-                      style={{ padding: '10px 18px', borderRadius: '10px', background: '#f1f5f9', border: '1px solid #cbd5e1', cursor: 'pointer' }}
-                    >
-                      ← Back
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!locality.trim()) {
-                          alert('Please enter your locality or sector.');
-                          return;
-                        }
-                        setCurrentStep(4);
-                      }}
-                      className="go"
-                      style={{ padding: '11px 24px', borderRadius: '10px', fontSize: '0.9rem', fontWeight: 700 }}
-                    >
-                      Next: Rent &amp; Terms →
-                    </button>
-                  </div>
-                </div>
-              )}
+                  {/* 2. Deposit & Move-in Terms */}
+                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 14px' }}>
+                      📅 2. Stay Terms &amp; Move-in Availability
+                    </h3>
 
-              {/* STEP 4: Rent & Availability */}
-              {currentStep === 4 && (
-                <div>
-                  <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 6px' }}>
-                    Step 4: Rent &amp; Availability Terms
-                  </h2>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--mut)', margin: '0 0 20px' }}>
-                    Clear financial expectations prevent visit cancellations and disputes.
-                  </p>
-
-                  <div style={{ display: 'grid', gap: '16px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px' }}>
                       <div>
                         <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Monthly Rent (₹) *
-                        </label>
-                        <input
-                          type="number"
-                          className="in"
-                          placeholder="e.g. 8500"
-                          value={rent}
-                          onChange={(e) => setRent(e.target.value)}
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Security Deposit (₹)
-                        </label>
-                        <input
-                          type="number"
-                          className="in"
-                          placeholder="Default is 1 month rent"
-                          value={deposit}
-                          onChange={(e) => setDeposit(e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Maintenance Charges (₹ / month)
-                        </label>
-                        <input
-                          type="number"
-                          className="in"
-                          placeholder="0 if included"
-                          value={maintenance}
-                          onChange={(e) => setMaintenance(e.target.value)}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Electricity &amp; Water Basis
-                        </label>
-                        <select className="in" value={electricityBasis} onChange={(e) => setElectricityBasis(e.target.value)}>
-                          <option value="METERED">Sub-metered (Per Unit ₹8-10)</option>
-                          <option value="INCLUDED">Included in Monthly Rent</option>
-                          <option value="FIXED">Fixed ₹500 - ₹1000 Extra / Month</option>
-                          <option value="ACTUALS">Shared Actual State EB Bill</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Brokerage (₹)
-                        </label>
-                        <input
-                          type="number"
-                          className="in"
-                          placeholder="₹0 for Direct Owners"
-                          value={brokerage}
-                          onChange={(e) => setBrokerage(e.target.value)}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Notice Period
-                        </label>
-                        <select className="in" value={noticePeriod} onChange={(e) => setNoticePeriod(e.target.value)}>
-                          <option value="15 Days">15 Days</option>
-                          <option value="1 Month">1 Month</option>
-                          <option value="2 Months">2 Months</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Available From Date (Move-in)
+                          Available From Date
                         </label>
                         <input
                           type="date"
@@ -1372,330 +1238,450 @@ export default function ListYourPropertyPage() {
 
                       <div>
                         <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Available Vacant Rooms / Beds
+                          Minimum Stay Commitment
                         </label>
-                        <input
-                          type="number"
-                          min="1"
-                          className="in"
-                          value={availableRooms}
-                          onChange={(e) => setAvailableRooms(e.target.value)}
-                        />
+                        <select className="in" value={minimumStay} onChange={(e) => setMinimumStay(e.target.value)}>
+                          <option value="1 Month">1 Month (Flexible)</option>
+                          <option value="3 Months">3 Months</option>
+                          <option value="6 Months">6 Months</option>
+                          <option value="11 Months">11 Months (Standard Lease)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                          Notice Period &amp; Move-out Rules
+                        </label>
+                        <select className="in" value={noticePeriod} onChange={(e) => setNoticePeriod(e.target.value)}>
+                          <option value="1 Month">1 Month Notice Period</option>
+                          <option value="15 Days">15 Days Notice Period</option>
+                          <option value="No Notice">No Notice (Month-to-Month)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                          Live Availability Status
+                        </label>
+                        <select className="in" value={availabilityStatus} onChange={(e) => setAvailabilityStatus(e.target.value)}>
+                          <option value="AVAILABLE">Available for Immediate Booking</option>
+                          <option value="OCCUPIED">Currently Occupied</option>
+                          <option value="UNDER_REPAIR">Temporarily Unavailable</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 3. Amenities & Facilities (Covering Wi-Fi, AC, Fan, Bed, Wardrobe, Parking, Lift, Power backup, Rules) */}
+                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                      <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: 0 }}>
+                        ✨ 3. Facilities &amp; Amenities
+                      </h3>
+                      <span style={{ fontSize: '0.78rem', color: 'var(--mut)' }}>
+                        {selectedAmenities.length} selected
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 180px), 1fr))', gap: '10px', marginBottom: '16px' }}>
+                      {AMENITIES_LIST.map((amenity) => {
+                        const isChecked = selectedAmenities.includes(amenity);
+                        return (
+                          <div
+                            key={amenity}
+                            onClick={() => handleAmenityToggle(amenity)}
+                            style={{
+                              padding: '10px 12px',
+                              borderRadius: '10px',
+                              border: `1.5px solid ${isChecked ? 'var(--blue)' : '#e2e8f0'}`,
+                              background: isChecked ? '#eff6ff' : '#ffffff',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              transition: 'all 0.15s ease',
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => {}}
+                              style={{ accentColor: 'var(--blue)', pointerEvents: 'none' }}
+                            />
+                            <span style={{ fontSize: '0.82rem', fontWeight: isChecked ? 700 : 500, color: isChecked ? 'var(--blue)' : 'var(--navy)' }}>
+                              {amenity}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Rules & Policies */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px', marginBottom: '14px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                          Visitors Policy
+                        </label>
+                        <select className="in" value={visitorsPolicy} onChange={(e) => setVisitorsPolicy(e.target.value)}>
+                          <option value="Allowed (Daytime)">Allowed (Daytime Only)</option>
+                          <option value="Overnight Allowed">Overnight Allowed with Notice</option>
+                          <option value="Strictly Prohibited">Visitors Not Allowed</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                          Pets Policy
+                        </label>
+                        <select className="in" value={petsPolicy} onChange={(e) => setPetsPolicy(e.target.value)}>
+                          <option value="Not Allowed">Not Allowed</option>
+                          <option value="Allowed">Pets Welcome</option>
+                          <option value="Cats Only">Cats Only</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                          Smoking Policy
+                        </label>
+                        <select className="in" value={smokingPolicy} onChange={(e) => setSmokingPolicy(e.target.value)}>
+                          <option value="Strictly Prohibited">Strictly Prohibited</option>
+                          <option value="Balcony Only">Allowed in Balcony / Outdoors</option>
+                          <option value="Permitted">Permitted</option>
+                        </select>
                       </div>
                     </div>
 
                     <div>
                       <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                        Initial Availability Status
+                        House Rules &amp; Move-Out Guidelines (Optional)
                       </label>
-                      <select className="in" value={availabilityStatus} onChange={(e) => setAvailabilityStatus(e.target.value)}>
-                        <option value="AVAILABLE">Available (Vacant &amp; Open for Visits)</option>
-                        <option value="OCCUPIED">Occupied (Full - No vacant beds)</option>
-                        <option value="UNAVAILABLE">Temporarily Unavailable</option>
-                      </select>
+                      <textarea
+                        rows={2}
+                        className="in"
+                        placeholder="e.g. Gate closes at 11:00 PM, quiet hours after 10 PM, deposit refund within 48h of move-out inspection."
+                        value={houseRules}
+                        onChange={(e) => setHouseRules(e.target.value)}
+                      />
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '24px' }}>
-                    <button
-                      type="button"
-                      onClick={() => setCurrentStep(3)}
-                      style={{ padding: '10px 18px', borderRadius: '10px', background: '#f1f5f9', border: '1px solid #cbd5e1', cursor: 'pointer' }}
-                    >
-                      ← Back
-                    </button>
+                  {/* 4. Photos & Video Upload */}
+                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: 0 }}>
+                        📸 4. Property Photos &amp; Video Walkthrough
+                      </h3>
+                      <span style={{ fontSize: '0.78rem', color: photos.length >= 4 ? '#16a34a' : '#d97706', fontWeight: 700 }}>
+                        {photos.length} photos uploaded (Min 4 recommended)
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '0.82rem', color: 'var(--mut)', margin: '0 0 16px' }}>
+                      High quality photos increase tenant inquiries by 3x. Supported formats: JPG, PNG, WEBP (Up to 10MB each).
+                    </p>
+
+                    {/* Category Selector for next upload */}
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '14px' }}>
+                      <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--navy)' }}>Upload as:</span>
+                      {['Room', 'Bathroom', 'Kitchen', 'Building / Exterior', 'Hall / Common Area'].map((cat) => (
+                        <button
+                          key={cat}
+                          type="button"
+                          onClick={() => setSelectedCategoryForNextPhoto(cat)}
+                          style={{
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            border: selectedCategoryForNextPhoto === cat ? '1px solid var(--blue)' : '1px solid #cbd5e1',
+                            background: selectedCategoryForNextPhoto === cat ? '#eff6ff' : '#ffffff',
+                            color: selectedCategoryForNextPhoto === cat ? 'var(--blue)' : 'var(--navy)',
+                          }}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div style={{ border: '2px dashed #cbd5e1', borderRadius: '14px', padding: '24px', textAlign: 'center', background: '#ffffff', marginBottom: '16px' }}>
+                      <div style={{ fontSize: '2rem', marginBottom: '6px' }}>📁</div>
+                      <label style={{ cursor: 'pointer', display: 'inline-block' }}>
+                        <span className="go" style={{ padding: '8px 18px', fontSize: '0.85rem', borderRadius: '8px' }}>
+                          {isUploading ? 'Uploading Photos...' : '+ Select Photos to Upload'}
+                        </span>
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          style={{ display: 'none' }}
+                          onChange={handlePhotoUpload}
+                          disabled={isUploading}
+                        />
+                      </label>
+                    </div>
+
+                    {/* Photo Previews */}
+                    {photos.length > 0 && (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 120px), 1fr))', gap: '10px', marginBottom: '16px' }}>
+                        {photos.map((p, idx) => (
+                          <div key={idx} style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', border: '1px solid #e2e8f0', aspectRatio: '4/3' }}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={p} alt={`Property upload ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <button
+                              type="button"
+                              onClick={() => removePhoto(idx)}
+                              style={{
+                                position: 'absolute',
+                                top: '4px',
+                                right: '4px',
+                                background: 'rgba(0,0,0,0.6)',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '22px',
+                                height: '22px',
+                                fontSize: '12px',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
+                        🎥 Video Walkthrough Link (Optional)
+                      </label>
+                      <input
+                        type="url"
+                        className="in"
+                        placeholder="e.g. YouTube, Google Drive, or MP4 link"
+                        value={videoUrl}
+                        onChange={(e) => setVideoUrl(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Navigation Buttons for Step 2 */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginTop: '24px' }}>
                     <button
                       type="button"
                       onClick={() => {
-                        if (!rent || Number(rent) <= 0) {
-                          alert('Please enter a valid monthly rent.');
-                          return;
-                        }
-                        setCurrentStep(5);
+                        setCurrentStep(1);
+                        document.getElementById('listing-form')?.scrollIntoView({ behavior: 'smooth' });
                       }}
-                      className="go"
-                      style={{ padding: '11px 24px', borderRadius: '10px', fontSize: '0.9rem', fontWeight: 700 }}
-                    >
-                      Next: Amenities &amp; Rules →
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* STEP 5: Facilities & House Rules */}
-              {currentStep === 5 && (
-                <div>
-                  <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 6px' }}>
-                    Step 5: Facilities &amp; Stay Rules
-                  </h2>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--mut)', margin: '0 0 20px' }}>
-                    Select confirmed amenities. Our field auditor will verify each item during the physical visit.
-                  </p>
-
-                  <div style={{ marginBottom: '22px' }}>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '10px' }}>
-                      Select Included Amenities (Verified on-site)
-                    </label>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px' }}>
-                      {AMENITIES_LIST.map((am) => {
-                        const checked = selectedAmenities.includes(am);
-                        return (
-                          <div
-                            key={am}
-                            onClick={() => toggleAmenity(am)}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                              padding: '10px 12px',
-                              borderRadius: '10px',
-                              border: `1.5px solid ${checked ? 'var(--blue)' : '#e2e8f0'}`,
-                              background: checked ? '#eff6ff' : '#ffffff',
-                              cursor: 'pointer',
-                              fontSize: '0.82rem',
-                              fontWeight: checked ? 700 : 500,
-                              color: checked ? 'var(--blue)' : '#334155',
-                            }}
-                          >
-                            <span>{checked ? '☑' : '☐'}</span>
-                            <span>{am}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '16px' }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                        Visitors Policy
-                      </label>
-                      <select className="in" value={visitorsPolicy} onChange={(e) => setVisitorsPolicy(e.target.value)}>
-                        <option value="Allowed (Daytime)">Allowed (Daytime until 8 PM)</option>
-                        <option value="24x7 Allowed">24x7 Allowed with ID</option>
-                        <option value="No Visitors">Strictly No Outside Visitors</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                        Pets Policy
-                      </label>
-                      <select className="in" value={petsPolicy} onChange={(e) => setPetsPolicy(e.target.value)}>
-                        <option value="Not Allowed">Not Allowed</option>
-                        <option value="Allowed">Allowed</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                        Smoking / Alcohol Policy
-                      </label>
-                      <select className="in" value={smokingPolicy} onChange={(e) => setSmokingPolicy(e.target.value)}>
-                        <option value="Strictly Prohibited">Strictly Prohibited</option>
-                        <option value="Balcony / Outdoor Only">Balcony / Outdoor Area Only</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                      Additional House Rules &amp; Move-out Guidelines
-                    </label>
-                    <textarea
-                      className="in"
-                      rows={2}
-                      placeholder="e.g. Gate closes at 11 PM. Cleanliness maintained in common areas."
-                      value={houseRules}
-                      onChange={(e) => setHouseRules(e.target.value)}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '24px' }}>
-                    <button
-                      type="button"
-                      onClick={() => setCurrentStep(4)}
-                      style={{ padding: '10px 18px', borderRadius: '10px', background: '#f1f5f9', border: '1px solid #cbd5e1', cursor: 'pointer' }}
-                    >
-                      ← Back
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setCurrentStep(6)}
-                      className="go"
-                      style={{ padding: '11px 24px', borderRadius: '10px', fontSize: '0.9rem', fontWeight: 700 }}
-                    >
-                      Next: Photos &amp; Video →
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* STEP 6: Photos, Video & Verification Submit */}
-              {currentStep === 6 && (
-                <div>
-                  <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 6px' }}>
-                    Step 6: Photos, Video &amp; Verification
-                  </h2>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--mut)', margin: '0 0 16px' }}>
-                    Per Find2Stay Quality Standards: Minimum 4 clear photos covering Room, Bathroom, Kitchen and Building.
-                  </p>
-
-                  {/* Photo Category Selector for upload */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--navy)' }}>
-                      Photo Tag Category:
-                    </span>
-                    {['Room', 'Bathroom', 'Kitchen', 'Building / Exterior'].map((cat) => (
-                      <button
-                        key={cat}
-                        type="button"
-                        onClick={() => setSelectedCategoryForNextPhoto(cat)}
-                        style={{
-                          padding: '4px 10px',
-                          borderRadius: '6px',
-                          fontSize: '0.78rem',
-                          fontWeight: 700,
-                          border: `1px solid ${selectedCategoryForNextPhoto === cat ? 'var(--blue)' : '#cbd5e1'}`,
-                          background: selectedCategoryForNextPhoto === cat ? '#eff6ff' : '#ffffff',
-                          color: selectedCategoryForNextPhoto === cat ? 'var(--blue)' : '#475569',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Photo Upload Dropzone */}
-                  <div
-                    style={{
-                      border: '2px dashed #93c5fd',
-                      borderRadius: '16px',
-                      padding: '24px',
-                      textAlign: 'center',
-                      background: '#f8fafc',
-                      marginBottom: '20px',
-                    }}
-                  >
-                    <input
-                      type="file"
-                      id="propertyPhotos"
-                      multiple
-                      accept="image/png,image/jpeg,image/webp"
-                      onChange={handleFileUpload}
-                      style={{ display: 'none' }}
-                    />
-                    <label
-                      htmlFor="propertyPhotos"
                       style={{
+                        padding: '11px 20px',
+                        borderRadius: '10px',
+                        background: '#f1f5f9',
+                        border: '1px solid #cbd5e1',
+                        color: 'var(--navy)',
+                        fontWeight: 600,
+                        fontSize: '0.88rem',
                         cursor: 'pointer',
-                        display: 'inline-flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '6px',
                       }}
                     >
-                      <span style={{ fontSize: '2.2rem' }}>📸</span>
-                      <strong style={{ fontSize: '0.95rem', color: 'var(--navy)' }}>
-                        {isUploading ? 'Uploading photos...' : 'Click to upload property photos'}
-                      </strong>
-                      <span style={{ fontSize: '0.78rem', color: '#64748b' }}>
-                        PNG, JPG, WEBP up to 8MB each. Tagged as <strong>{selectedCategoryForNextPhoto}</strong>.
-                      </span>
-                    </label>
-                  </div>
-
-                  {/* Thumbnails grid with category badges & delete */}
-                  {photos.length > 0 && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '10px', marginBottom: '20px' }}>
-                      {photos.map((p, idx) => (
-                        <div key={idx} style={{ position: 'relative', height: '100px', borderRadius: '10px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={p} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          <span
-                            style={{
-                              position: 'absolute',
-                              bottom: '4px',
-                              left: '4px',
-                              background: 'rgba(15,23,42,0.8)',
-                              color: '#fff',
-                              fontSize: '0.65rem',
-                              fontWeight: 700,
-                              padding: '2px 6px',
-                              borderRadius: '4px',
-                            }}
-                          >
-                            {photosCategorized[idx]?.category || 'Room'}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => removePhoto(idx)}
-                            style={{
-                              position: 'absolute',
-                              top: '4px',
-                              right: '4px',
-                              background: 'rgba(239,68,68,0.9)',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '50%',
-                              width: '20px',
-                              height: '20px',
-                              fontSize: '11px',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                            }}
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Video Walkthrough Link */}
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                      🎥 Short Video Walkthrough URL (Optional)
-                    </label>
-                    <input
-                      type="url"
-                      className="in"
-                      placeholder="e.g. YouTube, Google Drive, or MP4 link"
-                      value={videoUrl}
-                      onChange={(e) => setVideoUrl(e.target.value)}
-                    />
-                  </div>
-
-                  {/* Final Declarations */}
-                  <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                    <label className="chk-row" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.82rem', color: '#334155', cursor: 'pointer' }}>
-                      <input
-                        type="checkbox"
-                        style={{ width: '18px', height: '18px', flexShrink: 0, margin: '3px 0 0 0', accentColor: '#1d5bd8' }}
-                        checked={consent}
-                        onChange={(e) => setConsent(e.target.checked)}
-                      />
-                      <span>
-                        <strong>Accuracy &amp; On-Site Audit Agreement:</strong> I certify that all details provided are true and accurate. I agree to permit the Find2Stay local field operations specialist to conduct an in-person room audit before public verification activation.
-                      </span>
-                    </label>
-                  </div>
-
-                  {/* 6. Action Buttons */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-                    <button
-                      type="button"
-                      onClick={() => setCurrentStep(5)}
-                      style={{ padding: '10px 18px', borderRadius: '10px', background: '#f1f5f9', border: '1px solid #cbd5e1', cursor: 'pointer' }}
-                    >
-                      ← Back
+                      ← Back to Basic Info
                     </button>
 
                     <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                      {/* Save as Draft Button */}
+                      <button
+                        type="button"
+                        onClick={handleSaveDraft}
+                        style={{
+                          padding: '11px 20px',
+                          borderRadius: '10px',
+                          background: '#f8fafc',
+                          border: '1.5px solid #cbd5e1',
+                          color: 'var(--navy)',
+                          fontWeight: 700,
+                          fontSize: '0.88rem',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        📄 Save Draft
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleNextToStep3}
+                        className="go"
+                        style={{
+                          padding: '12px 28px',
+                          borderRadius: '12px',
+                          fontWeight: 800,
+                          fontSize: '0.92rem',
+                        }}
+                      >
+                        Next: Step 3 — Verification &amp; Submit →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 3: Verification & Submit (OTP, Authorisation Check, Submission & Property ID) */}
+              {currentStep === 3 && (
+                <div>
+                  <div style={{ marginBottom: '24px', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px' }}>
+                    <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 6px' }}>
+                      Step 3 — Verification &amp; Submit
+                    </h2>
+                    <p style={{ fontSize: '0.86rem', color: 'var(--mut)', margin: 0 }}>
+                      Complete contact OTP authorization, review platform policies, and submit for on-site inspection.
+                    </p>
+                  </div>
+
+                  {/* 1. Mobile OTP Authentication */}
+                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 8px' }}>
+                      📱 1. Mobile OTP Authorization
+                    </h3>
+                    <p style={{ fontSize: '0.82rem', color: 'var(--mut)', margin: '0 0 14px' }}>
+                      Confirm your direct mobile number (+91 {phone || 'XXXXXXXXXX'}) to prevent unauthorized listings.
+                    </p>
+
+                    {otpVerified ? (
+                      <div style={{ padding: '12px 16px', background: '#dcfce7', border: '1px solid #86efac', borderRadius: '10px', color: '#166534', fontWeight: 700, fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span>✓</span> Mobile Number (+91 {phone}) Authenticated via OTP
+                      </div>
+                    ) : (
+                      <div>
+                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                          <button
+                            type="button"
+                            onClick={handleSendOtp}
+                            disabled={otpLoading}
+                            style={{
+                              padding: '10px 18px',
+                              borderRadius: '8px',
+                              background: '#eff6ff',
+                              border: '1.5px solid #bfdbfe',
+                              color: 'var(--blue)',
+                              fontWeight: 700,
+                              fontSize: '0.85rem',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            {otpLoading ? 'Sending...' : otpSent ? '↻ Resend OTP' : 'Send Verification OTP'}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={handleAutofillOtp}
+                            style={{
+                              padding: '10px 18px',
+                              borderRadius: '8px',
+                              background: '#fef3c7',
+                              border: '1.5px solid #fde68a',
+                              color: '#92400e',
+                              fontWeight: 700,
+                              fontSize: '0.85rem',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            ⚡ Autofill OTP (Showcase Demo)
+                          </button>
+                        </div>
+
+                        {otpSent && (
+                          <div style={{ display: 'flex', gap: '8px', maxWidth: '300px', marginTop: '10px' }}>
+                            <input
+                              type="text"
+                              className="in"
+                              placeholder="Enter 6-digit OTP"
+                              maxLength={6}
+                              value={otpCode}
+                              onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                            />
+                            <button
+                              type="button"
+                              onClick={handleVerifyOtp}
+                              disabled={otpLoading}
+                              className="go"
+                              style={{ padding: '10px 18px', borderRadius: '8px', fontSize: '0.85rem' }}
+                            >
+                              Verify
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 2. Ownership & Authorization Check */}
+                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 14px' }}>
+                      ⚖️ 2. Ownership Declaration &amp; Audit Agreement
+                    </h3>
+
+                    <div style={{ display: 'grid', gap: '14px' }}>
+                      <label className="chk-row" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.84rem', color: '#1e293b', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={ownershipConfirmed}
+                          onChange={(e) => setOwnershipConfirmed(e.target.checked)}
+                          style={{ marginTop: '3px' }}
+                        />
+                        <span>
+                          <strong>Ownership / Authorisation Check:</strong> I declare under penalty of deactivation that I am the genuine legal owner, operator, or formally authorized representative with full power to list and lease this property on Find2Stay.
+                        </span>
+                      </label>
+
+                      <label className="chk-row" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.84rem', color: '#1e293b', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={consent}
+                          onChange={(e) => setConsent(e.target.checked)}
+                          style={{ marginTop: '3px' }}
+                        />
+                        <span>
+                          <strong>180-Day Audit Seal Agreement:</strong> I agree to allow Find2Stay field verification specialists to conduct an on-site physical room, safety, and RO water audit prior to full verified badge activation.
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* 3. Submission & Property Identification & QR Code Compliance Notice */}
+                  <div style={{ padding: '18px 20px', background: '#eff6ff', borderRadius: '16px', border: '1.5px solid #bfdbfe', marginBottom: '24px' }}>
+                    <h4 style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--blue)', margin: '0 0 6px' }}>
+                      📋 Submission &amp; Property Identification (Requirement 8 &amp; 9)
+                    </h4>
+                    <p style={{ fontSize: '0.82rem', color: '#1e40af', lineHeight: 1.6, margin: 0 }}>
+                      Upon clicking <strong>Submit for Verification</strong>, your listing will be registered with a unique Property ID (e.g. <code>F2S-NOI-XXXXX</code>) and marked <strong>PENDING_VERIFICATION</strong>.
+                      <br />
+                      <strong>Important QR Code Policy:</strong> In accordance with Find2Stay platform integrity rules, official printable Verified QR Codes and gate posters are generated exclusively for listings that have passed the physical inspection audit.
+                    </p>
+                  </div>
+
+                  {/* 4. Action Buttons */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentStep(2);
+                        document.getElementById('listing-form')?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      style={{
+                        padding: '11px 20px',
+                        borderRadius: '10px',
+                        background: '#f1f5f9',
+                        border: '1px solid #cbd5e1',
+                        color: 'var(--navy)',
+                        fontWeight: 600,
+                        fontSize: '0.88rem',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      ← Back to Property Details
+                    </button>
+
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      {/* Save Draft */}
                       <button
                         type="button"
                         onClick={handleSaveDraft}
@@ -1711,10 +1697,10 @@ export default function ListYourPropertyPage() {
                           cursor: 'pointer',
                         }}
                       >
-                        💾 Save as Draft
+                        📄 Save as Draft
                       </button>
 
-                      {/* Preview Listing Button */}
+                      {/* Preview Listing Modal */}
                       <button
                         type="button"
                         onClick={() => setIsPreviewOpen(true)}
@@ -1732,16 +1718,16 @@ export default function ListYourPropertyPage() {
                         👁️ Preview Listing
                       </button>
 
-                      {/* Submit for Verification Button */}
+                      {/* Submit for Verification */}
                       <button
                         type="button"
                         onClick={handleSubmit}
                         disabled={status === 'loading'}
                         className="go"
                         style={{
-                          padding: '11px 24px',
-                          borderRadius: '10px',
-                          fontSize: '0.9rem',
+                          padding: '12px 28px',
+                          borderRadius: '12px',
+                          fontSize: '0.92rem',
                           fontWeight: 800,
                         }}
                       >
@@ -1760,7 +1746,7 @@ export default function ListYourPropertyPage() {
             </div>
 
             {/* 10. Help / Sidebar ("Why List on Find2Stay?") */}
-            <div>
+            <div className="lyp-sidebar">
               <div
                 style={{
                   background: '#ffffff',
@@ -1810,8 +1796,8 @@ export default function ListYourPropertyPage() {
                     <div>Our local team visits to inspect room condition, sub-meters, and RO water TDS.</div>
                   </div>
                   <div>
-                    <strong style={{ color: 'var(--navy)' }}>4. Verified QR Live Seal</strong>
-                    <div>Listing goes live with the 180-day verified badge and QR download.</div>
+                    <strong style={{ color: 'var(--navy)' }}>4. Verified QR Seal Activated</strong>
+                    <div>Listing goes live with the 180-day audit seal and instant booking QR code.</div>
                   </div>
                 </div>
               </div>
@@ -1820,11 +1806,15 @@ export default function ListYourPropertyPage() {
         )}
       </div>
 
-      {/* Interactive Listing Preview Modal */}
+      {/* Live Listing Preview Modal */}
       <ListingPreviewModal
+        data={previewData}
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
-        data={previewData}
+        onSubmit={() => {
+          setIsPreviewOpen(false);
+          handleSubmit();
+        }}
       />
     </>
   );

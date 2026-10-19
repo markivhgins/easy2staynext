@@ -190,7 +190,7 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
           </Link>
         )}
 
-        {isOwner && (
+        {isOwner && !isOps && (
           <Link
             href="/owner"
             className="mobile-only-city"
@@ -274,8 +274,8 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
       {/* Saved Listings / Wishlist Shortcut */}
       <HeaderSavedButton />
 
-      {/* Desktop Owner Workspace Shortcut for Owners */}
-      {isOwner && (
+      {/* Desktop Owner Workspace Shortcut for Owners (Only for actual owners, not admins) */}
+      {isOwner && !isOps && (
         <Link
           href="/owner"
           style={{
@@ -296,11 +296,34 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
         </Link>
       )}
 
-      {/* Single Authoritative User Profile / Desk Button */}
-      {currentUser ? (
+      {/* Authoritative Desk Button: Admin gets dedicated Operations Desk; Tenants get Activity; Guests get Login */}
+      {isOps ? (
+        <Link
+          href="/admin"
+          title="Operations Desk: Verifications, Audits & Platform Queues"
+          style={{
+            flexShrink: 0,
+            padding: '6px 13px',
+            borderRadius: '8px',
+            background: '#0f172a',
+            border: '1px solid #1e293b',
+            color: '#38bdf8',
+            fontWeight: 700,
+            fontSize: '12px',
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+          }}
+        >
+          <span>🛡️</span>
+          <span>Admin Desk</span>
+        </Link>
+      ) : currentUser ? (
         <Link
           className="me"
-          href="/account/activity"
+          href={isOwner ? '/owner' : '/account/activity'}
           title="My Activity, Rented Stays & Requests"
           style={{
             flexShrink: 0,

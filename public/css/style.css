@@ -491,16 +491,17 @@ main, footer, .owner {
 /* Responsive List Your Property Layout */
 .lyp-layout {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 24px;
   align-items: start;
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
 }
-@media (min-width: 992px) {
+@media (min-width: 1100px) {
   .lyp-layout {
-    grid-template-columns: 1fr 340px;
-    gap: 32px;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 28px;
   }
 }
 
@@ -513,13 +514,33 @@ main, footer, .owner {
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
-  overflow-wrap: break-word;
+  min-width: 0;
+  overflow: hidden;
+  word-break: break-word;
 }
 @media (min-width: 768px) {
   .lyp-card {
     border-radius: 24px;
-    padding: 32px;
+    padding: 30px 24px;
   }
+}
+
+.lyp-sidebar {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.lyp-card * {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.lyp-card input,
+.lyp-card select,
+.lyp-card textarea,
+.lyp-card button {
+  max-width: 100%;
 }
 
 

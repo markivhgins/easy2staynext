@@ -16,10 +16,14 @@ export default async function ProfilePage() {
     redirect('/auth?next=/account/profile');
   }
 
+  const roles = user.roleAssignments || ['USER'];
+  if (roles.some((r: string) => ['ADMIN', 'OPERATIONS', 'SUPER_ADMIN'].includes(r))) {
+    redirect('/admin');
+  }
+
   const phone = user.phoneE164 || '';
   const displayName = user.displayName || `User (${phone.slice(-4)})`;
   const email = user.email || '';
-  const roles = user.roleAssignments || ['USER'];
 
   // Query user's listed properties
   let userListings: any[] = [];

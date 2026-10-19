@@ -40,8 +40,24 @@ export async function GET(req: NextRequest) {
     const matches = memoryDrafts.filter(
       (d) =>
         (session.userId && d.ownerId === session.userId) ||
-        (cleanPhone && d.phone && d.phone.replace(/\D/g, '').includes(cleanPhone))
+        (cleanPhone.length === 10 && d.phone && d.phone.replace(/\D/g, '').endsWith(cleanPhone))
     );
+
+    try {
+      const db = await getDb();
+      const queryOr: any[] = [];
+      if (session.userId) queryOr.push({ ownerId: session.userId });
+      if (cleanPhone.length === 10) queryOr.push({ phone: { $regex: cleanPhone } });
+
+      if (queryOr.length > 0) {
+        const dbDrafts = await db.collection('drafts').find({ $or: queryOr }).sort({ createdAt: -1 }).toArray();
+        for (const dbd of dbDrafts) {
+          if (!matches.some((m) => m._id?.toString() === dbd._id?.toString() || (m.propertyId && m.propertyId === dbd.propertyId))) {
+            matches.push(dbd as any);
+          }
+        }
+      }
+    } catch {}
 
     return NextResponse.json({ success: true, drafts: matches });
   } catch (err) {

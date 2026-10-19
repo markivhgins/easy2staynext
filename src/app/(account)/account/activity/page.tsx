@@ -21,11 +21,15 @@ export default async function UserActivityPage() {
     redirect('/auth?next=/account/activity');
   }
 
+  const roles = user.roleAssignments || ['USER'];
+  if (roles.some((r: string) => ['ADMIN', 'OPERATIONS', 'SUPER_ADMIN'].includes(r))) {
+    redirect('/admin');
+  }
+
   const phone = user.phoneE164 || '';
   const cleanPhone = phone.replace(/\D/g, '');
   const userPhoneClean = cleanPhone.slice(-10);
   const displayName = user.displayName || `User (${userPhoneClean.slice(-4) || '3210'})`;
-  const roles = user.roleAssignments || ['USER'];
 
   let enquiries: any[] = [];
   let services: any[] = [];

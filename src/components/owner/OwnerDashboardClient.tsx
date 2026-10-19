@@ -293,7 +293,7 @@ export const OwnerDashboardClient: React.FC<OwnerDashboardClientProps> = ({
                     />
 
                     {/* QR Code Button ONLY for Verified / Published Properties */}
-                    {isPublished && (
+                    {isPublished ? (
                       <button
                         type="button"
                         onClick={() => setSelectedQrDraft({ propertyId, title: draft.title, slugOrId: listingSlug })}
@@ -313,6 +313,24 @@ export const OwnerDashboardClient: React.FC<OwnerDashboardClientProps> = ({
                       >
                         📱 Verified QR
                       </button>
+                    ) : (
+                      <span
+                        title="QR codes are generated exclusively for verified listings upon physical audit completion"
+                        style={{
+                          padding: '7px 10px',
+                          borderRadius: '8px',
+                          background: '#f1f5f9',
+                          border: '1px solid #e2e8f0',
+                          color: '#64748b',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        🔒 QR Pending Audit
+                      </span>
                     )}
 
                     <button

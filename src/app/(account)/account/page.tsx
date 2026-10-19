@@ -7,6 +7,10 @@ export default async function AccountPage() {
     redirect('/auth?next=/account');
   }
 
+  if (session.roles?.some((r) => ['ADMIN', 'OPERATIONS', 'SUPER_ADMIN'].includes(r))) {
+    redirect('/admin');
+  }
+
   // If user is predominantly an owner, direct to owner desk; otherwise to tenant activity
   if (session.roles?.includes('OWNER')) {
     redirect('/owner');

@@ -23,36 +23,43 @@ export default async function OwnerDashboardPage() {
   const user = await getCurrentUser();
   const phone = session.phone || user?.phoneE164 || '';
   const cleanPhone = phone.replace(/\D/g, '');
+  const clean10 = cleanPhone.slice(-10);
+  const hasValidPhone = clean10.length === 10;
 
   let myDrafts: any[] = [];
   let myEnquiries: any[] = [];
 
-  // 1. Fetch from memoryDrafts
-  const memMatches = memoryDrafts.filter(
-    (d) =>
-      (d.phone && d.phone.replace(/\D/g, '').includes(cleanPhone.slice(-10))) ||
-      d.ownerId === session.userId
-  );
+  // 1. Fetch strictly matching drafts from memoryDrafts
+  const memMatches = memoryDrafts.filter((d) => {
+    if (session.userId && d.ownerId === session.userId) return true;
+    if (hasValidPhone && d.phone && d.phone.replace(/\D/g, '').endsWith(clean10)) return true;
+    return false;
+  });
 
   myDrafts = [...memMatches];
 
   // 2. Fetch from MongoDB if available
   try {
     const db = await getDb();
-    const dbDrafts = await db
-      .collection('drafts')
-      .find({
-        $or: [
-          { ownerId: session.userId },
-          { phone: { $regex: cleanPhone.slice(-10) } },
-        ],
-      })
-      .sort({ createdAt: -1 })
-      .toArray();
+    const queryConditions: any[] = [];
+    if (session.userId) {
+      queryConditions.push({ ownerId: session.userId });
+    }
+    if (hasValidPhone) {
+      queryConditions.push({ phone: { $regex: clean10 } });
+    }
 
-    for (const d of dbDrafts) {
-      if (!myDrafts.some((m) => m._id?.toString() === d._id?.toString() || m.propertyId === d.propertyId)) {
-        myDrafts.push(d);
+    if (queryConditions.length > 0) {
+      const dbDrafts = await db
+        .collection('drafts')
+        .find({ $or: queryConditions })
+        .sort({ createdAt: -1 })
+        .toArray();
+
+      for (const d of dbDrafts) {
+        if (!myDrafts.some((m) => m._id?.toString() === d._id?.toString() || (m.propertyId && m.propertyId === d.propertyId))) {
+          myDrafts.push(d);
+        }
       }
     }
 
@@ -72,57 +79,14 @@ export default async function OwnerDashboardPage() {
 
   // Cross-reference in-memory enquiries for owner's properties
   const propertyTitleLowerList = myDrafts.map((d) => d.title?.toLowerCase()).filter(Boolean);
-  for (const me of memoryEnquiries) {
-    if (propertyTitleLowerList.includes(me.listingTitle?.toLowerCase())) {
-      if (!myEnquiries.some((e) => e.requestId === me.requestId)) {
-        myEnquiries.unshift(me);
+  if (propertyTitleLowerList.length > 0) {
+    for (const me of memoryEnquiries) {
+      if (propertyTitleLowerList.includes(me.listingTitle?.toLowerCase())) {
+        if (!myEnquiries.some((e) => e.requestId === me.requestId)) {
+          myEnquiries.unshift(me);
+        }
       }
     }
-  }
-
-  // If no drafts submitted yet, provide a demo verified listing and pending entry so the owner sees the working dashboard
-  if (myDrafts.length === 0) {
-    myDrafts = [
-      {
-        _id: 'draft_demo_live',
-        propertyId: 'F2S-NOI-84920',
-        title: 'Aura Executive PG & Co-Living',
-        locality: 'Sector 62',
-        city: 'Noida',
-        type: 'PG',
-        gender: 'boys',
-        occupancy: 'single',
-        sharing: 'Single',
-        rent: 8500,
-        deposit: 8500,
-        status: 'PUBLISHED',
-        isVerified: true,
-        availabilityStatus: 'AVAILABLE',
-        availableRooms: 3,
-        totalRooms: 12,
-        electricityBasis: 'METERED',
-        createdAt: new Date(),
-      },
-      {
-        _id: 'draft_demo_pending',
-        propertyId: 'F2S-NOI-12903',
-        title: 'Silicon City 2BHK High-Rise',
-        locality: 'Sector 76',
-        city: 'Noida',
-        type: 'Flat',
-        gender: 'any',
-        occupancy: 'family',
-        rent: 24000,
-        deposit: 24000,
-        status: 'INSPECTION_SCHEDULED',
-        isVerified: false,
-        availabilityStatus: 'AVAILABLE',
-        availableRooms: 1,
-        totalRooms: 1,
-        electricityBasis: 'INCLUDED',
-        createdAt: new Date(),
-      },
-    ];
   }
 
   // Serialize drafts for client component
