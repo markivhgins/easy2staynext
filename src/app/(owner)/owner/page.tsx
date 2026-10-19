@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { getSession, getCurrentUser } from '@/lib/auth';
 import { getDb } from '@/lib/db';
 import { memoryDrafts } from '@/lib/memoryDrafts';
+import { memoryEnquiries } from '@/lib/memoryEnquiries';
 import { OwnerDashboardClient } from '@/components/owner/OwnerDashboardClient';
 
 export const metadata = {
@@ -67,6 +68,16 @@ export default async function OwnerDashboardPage() {
     }
   } catch (err) {
     console.warn('[owner/dashboard] DB query offline, using memory queue:', err);
+  }
+
+  // Cross-reference in-memory enquiries for owner's properties
+  const propertyTitleLowerList = myDrafts.map((d) => d.title?.toLowerCase()).filter(Boolean);
+  for (const me of memoryEnquiries) {
+    if (propertyTitleLowerList.includes(me.listingTitle?.toLowerCase())) {
+      if (!myEnquiries.some((e) => e.requestId === me.requestId)) {
+        myEnquiries.unshift(me);
+      }
+    }
   }
 
   // If no drafts submitted yet, provide a demo verified listing and pending entry so the owner sees the working dashboard
@@ -177,6 +188,37 @@ export default async function OwnerDashboardPage() {
       </section>
 
       <div className="wrap" style={{ maxWidth: '1140px', margin: '30px auto 80px', padding: '0 16px' }}>
+        {/* Workspace Mode Switcher between Tenant & Landlord */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', background: '#e2e8f0', padding: '4px', borderRadius: '12px', width: 'fit-content' }}>
+          <Link
+            href="/account/activity"
+            style={{
+              padding: '8px 18px',
+              borderRadius: '8px',
+              fontSize: '13px',
+              fontWeight: 700,
+              textDecoration: 'none',
+              background: 'transparent',
+              color: 'var(--mut)',
+            }}
+          >
+            👤 Tenant Desk (My Stays &amp; Visits)
+          </Link>
+          <div
+            style={{
+              padding: '8px 18px',
+              borderRadius: '8px',
+              fontSize: '13px',
+              fontWeight: 700,
+              background: '#059669',
+              color: '#ffffff',
+              boxShadow: '0 2px 6px rgba(5,150,105,0.3)',
+            }}
+          >
+            🏡 Landlord Portal (My Listings &amp; Inquiries)
+          </div>
+        </div>
+
         <OwnerDashboardClient
           initialDrafts={serializedDrafts}
           initialEnquiries={serializedEnquiries}

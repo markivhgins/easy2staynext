@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth';
 import { getListingBySlug } from '@/lib/listings';
 import { ObjectId } from 'mongodb';
 import { randomBytes } from 'crypto';
+import { memoryEnquiries } from '@/lib/memoryEnquiries';
 
 export async function POST(req: NextRequest) {
   try {
@@ -175,6 +176,9 @@ export async function POST(req: NextRequest) {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
+
+      // Always persist in memory queue
+      memoryEnquiries.unshift(enquiryDoc);
 
       await db.collection('enquiries').insertOne(enquiryDoc);
     } catch (dbErr) {

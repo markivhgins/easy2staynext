@@ -93,18 +93,47 @@ export default async function ProfilePage() {
               🔍 Browse Stays
             </Link>
 
-            {/* Owner Workspace Navigation Link */}
+            {/* High-visibility Landlord Workspace Switcher */}
             {isOwner ? (
-              <Link href="/owner" style={{ color: '#6EE7B7', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span>🏡 Owner Workspace</span>
-                <span style={{ fontSize: '11px', background: 'rgba(16,185,129,0.25)', color: '#A7F3D0', padding: '2px 8px', borderRadius: '999px' }}>
-                  {userListings.length} {userListings.length === 1 ? 'Stay' : 'Stays'}
+              <Link
+                href="/owner"
+                style={{
+                  color: '#ffffff',
+                  fontWeight: 800,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                  padding: '9px 12px',
+                  borderRadius: '10px',
+                  margin: '12px 0 4px',
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 12px rgba(16,185,129,0.3)',
+                }}
+              >
+                <span>🏡 Landlord Portal</span>
+                <span style={{ fontSize: '10.5px', background: 'rgba(255,255,255,0.25)', color: '#ffffff', padding: '2px 8px', borderRadius: '999px', fontWeight: 800 }}>
+                  {userListings.length} Listed
                 </span>
               </Link>
             ) : (
-              <Link href="/list-your-property" style={{ color: '#FDBA74', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span>🏡 List Property</span>
-                <span style={{ fontSize: '10.5px', background: 'rgba(251,146,60,0.25)', color: '#FFEDD5', padding: '2px 6px', borderRadius: '4px' }}>
+              <Link
+                href="/list-your-property"
+                style={{
+                  color: '#ffffff',
+                  fontWeight: 800,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: 'linear-gradient(135deg, #ea580c 0%, #f97316 100%)',
+                  padding: '9px 12px',
+                  borderRadius: '10px',
+                  margin: '12px 0 4px',
+                  textDecoration: 'none',
+                }}
+              >
+                <span>🏡 List a Property</span>
+                <span style={{ fontSize: '10.5px', background: 'rgba(255,255,255,0.25)', color: '#ffffff', padding: '2px 6px', borderRadius: '4px', fontWeight: 800 }}>
                   Free
                 </span>
               </Link>
@@ -123,6 +152,37 @@ export default async function ProfilePage() {
         </aside>
 
         <div>
+          {/* Top Workspace Mode Toggle */}
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', background: '#e2e8f0', padding: '4px', borderRadius: '12px', width: 'fit-content' }}>
+            <div
+              style={{
+                padding: '8px 18px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: 700,
+                background: 'var(--blue)',
+                color: '#ffffff',
+                boxShadow: '0 2px 6px rgba(22,72,232,0.3)',
+              }}
+            >
+              👤 Tenant Desk (My Stays &amp; Visits)
+            </div>
+            <Link
+              href="/owner"
+              style={{
+                padding: '8px 18px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: 700,
+                textDecoration: 'none',
+                background: 'transparent',
+                color: 'var(--mut)',
+              }}
+            >
+              🏡 Landlord Portal ({userListings.length > 0 ? `${userListings.length} Listed` : 'List Property'}) →
+            </Link>
+          </div>
+
           {/* Identity & Verification Card */}
           <div className="panel" style={{ borderRadius: '14px', marginBottom: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>

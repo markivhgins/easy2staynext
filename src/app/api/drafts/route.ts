@@ -259,6 +259,21 @@ export async function POST(req: NextRequest) {
         { $set: draftRecord },
         { upsert: true }
       );
+
+      // Elevate user role to OWNER in session and MongoDB user document
+      const session = await getSession();
+      if (!session.roles) session.roles = ['USER'];
+      if (!session.roles.includes('OWNER')) {
+        session.roles.push('OWNER');
+      }
+      await session.save();
+
+      if (session.userId) {
+        await db.collection('users').updateOne(
+          { _id: new ObjectId(session.userId) },
+          { $addToSet: { roleAssignments: 'OWNER' } }
+        );
+      }
     } catch (dbErr) {
       console.warn('[drafts] MongoDB offline, stored in in-memory queue:', (dbErr as Error).message);
     }

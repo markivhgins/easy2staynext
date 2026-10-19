@@ -24,9 +24,20 @@ export async function GET() {
     // Check if user has submitted properties in drafts or memory
     const phone = session.phone || (user as { phoneE164?: string })?.phoneE164 || '';
     const clean10 = phone.replace(/\D/g, '').slice(-10);
-    const hasProperties = clean10
+    let hasProperties = clean10
       ? memoryDrafts.some((m) => m.phone?.includes(clean10) || m.ownerId === session.userId)
       : false;
+
+    if (!hasProperties && clean10) {
+      try {
+        const { getDb } = await import('@/lib/db');
+        const db = await getDb();
+        const found = await db.collection('drafts').findOne({
+          $or: [{ phone: { $regex: clean10 } }, { ownerId: session.userId }],
+        });
+        if (found) hasProperties = true;
+      } catch {}
+    }
 
     if (hasProperties && !roles.includes('OWNER')) {
       roles.push('OWNER');

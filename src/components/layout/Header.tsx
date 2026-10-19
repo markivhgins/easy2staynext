@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLocation } from '@/context/LocationContext';
 import { HeaderSavedButton } from './HeaderSavedButton';
+import { ServicesDropdown } from './ServicesDropdown';
 
 interface HeaderProps {
   user?: {
@@ -17,12 +18,12 @@ interface HeaderProps {
   } | null;
 }
 
-const NAV_LINKS = [
+const NAV_LINKS_BEFORE = [
   { href: '/pg', label: 'Find a Room' },
   { href: '/flats', label: 'Flats' },
-  { href: '/services/food', label: 'Tiffin Service' },
-  { href: '/services/movers', label: 'Shifting Service' },
-  { href: '/services/water', label: 'RO Water' },
+];
+
+const NAV_LINKS_AFTER = [
   { href: '/list-your-property', label: 'List Your Property' },
   { href: '/about', label: 'About Us' },
   { href: '/blog', label: 'Blog' },
@@ -138,7 +139,26 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
           <span>City: {city.name} (Change)</span>
         </button>
 
-        {NAV_LINKS.map((link) => (
+        {NAV_LINKS_BEFORE.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className={isActive(link.href) ? 'on' : ''}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            {link.label}
+          </Link>
+        ))}
+
+        {/* Grouped Services Tab with Dropdown */}
+        <div className="desktop-only-services">
+          <ServicesDropdown isMobile={false} onNavigate={() => setMobileMenuOpen(false)} />
+        </div>
+        <div className="mobile-only-services">
+          <ServicesDropdown isMobile={true} onNavigate={() => setMobileMenuOpen(false)} />
+        </div>
+
+        {NAV_LINKS_AFTER.map((link) => (
           <Link
             key={link.href}
             href={link.href}
@@ -222,6 +242,7 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
           cursor: 'pointer',
           background: '#ffffff',
           fontFamily: 'inherit',
+          flexShrink: 0,
         }}
       >
         <svg
@@ -258,15 +279,16 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
         <Link
           href="/owner"
           style={{
-            padding: '7px 12px',
+            padding: '6px 12px',
             borderRadius: '999px',
             background: '#ecfdf5',
             border: '1.5px solid #a7f3d0',
             color: '#065f46',
             fontWeight: 700,
-            fontSize: '12.5px',
+            fontSize: '12px',
             textDecoration: 'none',
             whiteSpace: 'nowrap',
+            flexShrink: 0,
           }}
           title="Open Landlord Property Workspace"
         >
@@ -276,11 +298,22 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
 
       {/* Single Authoritative User Profile / Desk Button */}
       {currentUser ? (
-        <Link className="me" href="/account/activity" title="My Activity, Rented Stays & Requests">
+        <Link
+          className="me"
+          href="/account/activity"
+          title="My Activity, Rented Stays & Requests"
+          style={{
+            flexShrink: 0,
+            maxWidth: '135px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
           👤 {currentUser.name || currentUser.phone || 'My Account'}
         </Link>
       ) : (
-        <Link className="me" href="/auth">
+        <Link className="me" href="/auth" style={{ flexShrink: 0 }}>
           Login
         </Link>
       )}
@@ -291,6 +324,18 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
           href="/api/auth/logout"
           onClick={handleLogout}
           title="Sign out of account"
+          style={{
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
+            padding: '6px 11px',
+            borderRadius: '8px',
+            background: '#fef2f2',
+            border: '1px solid #fecaca',
+            color: '#dc2626',
+            fontWeight: 700,
+            fontSize: '12px',
+            display: 'inline-block',
+          }}
         >
           Sign out
         </a>

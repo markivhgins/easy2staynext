@@ -4,9 +4,12 @@ import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth';
 import { getDb } from '@/lib/db';
 import { ObjectId } from 'mongodb';
+import { memoryConnections } from '@/lib/memoryConnections';
+import { memoryEnquiries } from '@/lib/memoryEnquiries';
+import { memoryDrafts } from '@/lib/memoryDrafts';
 
 export const metadata = {
-  title: 'My Activity & Requests | Find2Stay',
+  title: 'My Stays & Activity | Find2Stay',
 };
 
 const FL = ['Requested', 'Confirming', 'Scheduled', 'Completed'];
@@ -19,7 +22,9 @@ export default async function UserActivityPage() {
   }
 
   const phone = user.phoneE164 || '';
-  const displayName = user.displayName || `User (${phone.slice(-4)})`;
+  const cleanPhone = phone.replace(/\D/g, '');
+  const userPhoneClean = cleanPhone.slice(-10);
+  const displayName = user.displayName || `User (${userPhoneClean.slice(-4) || '3210'})`;
   const roles = user.roleAssignments || ['USER'];
 
   let enquiries: any[] = [];
@@ -29,7 +34,6 @@ export default async function UserActivityPage() {
   try {
     const db = await getDb();
     const userId = new ObjectId(user._id);
-    const userPhoneClean = phone.replace(/\D/g, '').slice(-10);
 
     enquiries = await db
       .collection('enquiries')
@@ -62,14 +66,46 @@ export default async function UserActivityPage() {
     // In local dev without live Atlas, keep arrays empty gracefully
   }
 
-  // If user has confirmed bookings or scheduled visits, show clear distinction
+  // Cross-reference in-memory connections so relocation services never disappear
+  for (const mc of memoryConnections) {
+    const mcPhone = String(mc.phone || '').replace(/\D/g, '').slice(-10);
+    const matchesUser =
+      (userPhoneClean && mcPhone.includes(userPhoneClean)) ||
+      (mc.userId && (mc.userId.toString() === user._id?.toString() || mc.userId === user._id?.toString()));
+    if (matchesUser) {
+      if (!services.some((s) => s.requestId === mc.requestId || s._id?.toString() === mc._id?.toString())) {
+        services.unshift(mc);
+      }
+    }
+  }
+
+  // Cross-reference in-memory enquiries so visits never disappear
+  for (const me of memoryEnquiries) {
+    const mePhone = String(me.phone || '').replace(/\D/g, '').slice(-10);
+    const matchesUser =
+      (userPhoneClean && mePhone.includes(userPhoneClean)) ||
+      (me.userId && (me.userId.toString() === user._id?.toString() || me.userId === user._id?.toString()));
+    if (matchesUser) {
+      if (!enquiries.some((e) => e.requestId === me.requestId || e._id?.toString() === me._id?.toString())) {
+        enquiries.unshift(me);
+      }
+    }
+  }
+
+  // Check if user has listed properties (from memoryDrafts or DB)
+  const userDrafts = memoryDrafts.filter((d) => {
+    const dPhone = String(d.phone || '').replace(/\D/g, '').slice(-10);
+    return (userPhoneClean && dPhone.includes(userPhoneClean)) || (d.ownerId && d.ownerId === user._id?.toString());
+  });
+
+  const isOwner = roles.includes('OWNER') || userDrafts.length > 0;
   const confirmedStays = bookings.filter((b) => b.status === 'CONFIRMED' || b.status === 'ACTIVE' || b.status === 'RENTED');
 
   return (
     <>
       <section className="head">
         <div className="wrap">
-          <h1>My Stays, Visits &amp; Requests</h1>
+          <h1>Tenant &amp; Resident Workspace</h1>
           <p>
             Track your rented accommodations, scheduled on-site visits, and everyday relocation service orders.
           </p>
@@ -100,11 +136,53 @@ export default async function UserActivityPage() {
             <Link href="/services/food">
               🍲 Relocation Services
             </Link>
-            {roles.includes('OWNER') && (
-              <Link href="/owner" style={{ color: '#6EE7B7', fontWeight: 700 }}>
-                🏡 Owner Workspace →
+
+            {/* High-visibility Landlord Workspace Switcher */}
+            {isOwner ? (
+              <Link
+                href="/owner"
+                style={{
+                  color: '#ffffff',
+                  fontWeight: 800,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                  padding: '9px 12px',
+                  borderRadius: '10px',
+                  margin: '12px 0 4px',
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 12px rgba(16,185,129,0.3)',
+                }}
+              >
+                <span>🏡 Landlord Portal</span>
+                <span style={{ fontSize: '10.5px', background: 'rgba(255,255,255,0.25)', color: '#ffffff', padding: '2px 8px', borderRadius: '999px', fontWeight: 800 }}>
+                  {userDrafts.length} Listed
+                </span>
+              </Link>
+            ) : (
+              <Link
+                href="/list-your-property"
+                style={{
+                  color: '#ffffff',
+                  fontWeight: 800,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: 'linear-gradient(135deg, #ea580c 0%, #f97316 100%)',
+                  padding: '9px 12px',
+                  borderRadius: '10px',
+                  margin: '12px 0 4px',
+                  textDecoration: 'none',
+                }}
+              >
+                <span>🏡 List a Property</span>
+                <span style={{ fontSize: '10.5px', background: 'rgba(255,255,255,0.25)', color: '#ffffff', padding: '2px 6px', borderRadius: '4px', fontWeight: 800 }}>
+                  Free
+                </span>
               </Link>
             )}
+
             {roles.includes('OPS') && (
               <Link href="/admin">
                 ⚙️ Operations Desk
@@ -118,6 +196,37 @@ export default async function UserActivityPage() {
         </aside>
 
         <div>
+          {/* Top Workspace Mode Toggle */}
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', background: '#e2e8f0', padding: '4px', borderRadius: '12px', width: 'fit-content' }}>
+            <div
+              style={{
+                padding: '8px 18px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: 700,
+                background: 'var(--blue)',
+                color: '#ffffff',
+                boxShadow: '0 2px 6px rgba(22,72,232,0.3)',
+              }}
+            >
+              👤 Tenant Desk (My Stays &amp; Visits)
+            </div>
+            <Link
+              href="/owner"
+              style={{
+                padding: '8px 18px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: 700,
+                textDecoration: 'none',
+                background: 'transparent',
+                color: 'var(--mut)',
+              }}
+            >
+              🏡 Landlord Portal ({userDrafts.length > 0 ? `${userDrafts.length} Listed` : 'List Property'}) →
+            </Link>
+          </div>
+
           {/* Stats Bar */}
           <div className="stats" style={{ marginTop: 0, marginBottom: '28px' }}>
             <div>
