@@ -88,24 +88,20 @@ export default async function HomePage() {
             />
 
             <div className="h2pic-overlay-card">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '2px' }}>
-                <span className="h2pic-eyebrow">Your Safe Landing · Across India</span>
-                <span style={{ fontSize: '10.5px', fontWeight: 700, background: 'rgba(16,185,129,0.25)', border: '1px solid rgba(16,185,129,0.4)', color: '#6EE7B7', padding: '2px 8px', borderRadius: '999px' }}>
-                  ● 24+ New Stays Added
-                </span>
-              </div>
-              <h3 className="h2pic-title">
-                New City · <em>New Life</em> · <span>Right Stay</span>
-              </h3>
-              <div className="h2pic-meta">
-                <div className="h2pic-avatars">
-                  <span className="h2pic-avatar" title="Verified University Students">🎓</span>
-                  <span className="h2pic-avatar" title="Competitive Exam Aspirants">📚</span>
-                  <span className="h2pic-avatar" title="Working Professionals">💼</span>
+              <div className="h2pic-compact-wrap">
+                <div className="h2pic-compact-left">
+                  <div className="h2pic-avatars">
+                    <span className="h2pic-avatar" title="Students">🎓</span>
+                    <span className="h2pic-avatar" title="Aspirants">📚</span>
+                    <span className="h2pic-avatar" title="Professionals">💼</span>
+                  </div>
+                  <strong className="h2pic-compact-text">
+                    New City · <em>New Life</em> · <span>Right Stay</span>
+                  </strong>
                 </div>
-                <span className="h2pic-stat">
-                  <b>4.9 ★</b> (2,400+ verified reviews) · Top Student Hubs
-                </span>
+                <div className="h2pic-compact-right">
+                  <b>4.9 ★</b> (2,400+ reviews)
+                </div>
               </div>
             </div>
           </div>

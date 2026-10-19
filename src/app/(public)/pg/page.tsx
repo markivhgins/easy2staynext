@@ -1,4 +1,5 @@
 import React from 'react';
+import { DynamicPageTitle } from '@/components/layout/DynamicPageTitle';
 import Link from 'next/link';
 import { searchListings } from '@/lib/listings';
 import { SearchWithMap } from '@/components/listings/SearchWithMap';
@@ -49,7 +50,7 @@ export default async function PgPage({ searchParams }: PageProps) {
             <span className="wow-pill">⚡ ₹0 Brokerage</span>
             <span className="wow-pill">🍽️ Hygienic Mess &amp; Wi-Fi</span>
           </div>
-          <h1>Verified PGs &amp; Co-Living in Noida &amp; Delhi NCR</h1>
+          <DynamicPageTitle prefix="Verified PGs &amp; Co-Living" defaultCity="Noida" />
           <p>
             Curated student and working professional stays across Sector 62, Sector 126 Amity, Knowledge Park Greater Noida, and Indirapuram with transparent per-bed pricing.
           </p>

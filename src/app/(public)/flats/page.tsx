@@ -1,4 +1,5 @@
 import React from 'react';
+import { DynamicPageTitle } from '@/components/layout/DynamicPageTitle';
 import Link from 'next/link';
 import { searchListings } from '@/lib/listings';
 import { SearchWithMap } from '@/components/listings/SearchWithMap';
@@ -46,7 +47,7 @@ export default async function FlatsPage({ searchParams }: PageProps) {
             <span className="wow-pill">⚡ Direct Owner Connect</span>
             <span className="wow-pill">🏙️ Gated &amp; Standalone Flats</span>
           </div>
-          <h1>Flats &amp; Apartments in Noida &amp; Delhi NCR</h1>
+          <DynamicPageTitle prefix="Flats &amp; Apartments" defaultCity="Noida" />
           <p>
             Curated 1RK, 1BHK, 2BHK and 3BHK verified apartments across Sector 77, Sector 137, Sector 93B, and Indirapuram with itemised breakdown of rent, maintenance &amp; deposits.
           </p>

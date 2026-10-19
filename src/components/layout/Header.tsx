@@ -19,10 +19,12 @@ interface HeaderProps {
 
 const NAV_LINKS = [
   { href: '/pg', label: 'Find a Room' },
+  { href: '/flats', label: 'Flats' },
   { href: '/services/food', label: 'Tiffin Service' },
   { href: '/services/movers', label: 'Shifting Service' },
   { href: '/services/water', label: 'RO Water' },
-  { href: '/list-your-property', label: 'List Your Property', highlighted: true },
+  { href: '/list-your-property', label: 'List Your Property' },
+  { href: '/about', label: 'About Us' },
   { href: '/blog', label: 'Blog' },
   { href: '/help', label: 'Help' },
 ];
@@ -56,7 +58,6 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
     };
   }, [pathname, syncSession]);
 
-  // Sync when initialUser prop updates from server if provided
   useEffect(() => {
     if (initialUser) {
       setCurrentUser(initialUser);
@@ -66,6 +67,15 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
     return pathname === href || pathname.startsWith(href + '/');
+  };
+
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch {}
+    window.dispatchEvent(new Event('f2s-auth-change'));
+    window.location.href = '/';
   };
 
   const isOps =
@@ -132,23 +142,9 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
           <Link
             key={link.href}
             href={link.href}
-            className={`${isActive(link.href) ? 'on' : ''} ${link.highlighted ? 'header-highlighted-btn' : ''}`}
+            className={isActive(link.href) ? 'on' : ''}
             onClick={() => setMobileMenuOpen(false)}
-            style={
-              link.highlighted
-                ? {
-                    background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
-                    color: '#ffffff',
-                    fontWeight: 700,
-                    borderRadius: '8px',
-                    padding: '7px 14px',
-                    boxShadow: '0 2px 6px rgba(29, 78, 216, 0.25)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                  }
-                : undefined
-            }
           >
-            {link.highlighted && <span style={{ marginRight: '4px' }}>🏡</span>}
             {link.label}
           </Link>
         ))}
@@ -198,7 +194,10 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
           <a
             className="navso"
             href="/api/auth/logout"
-            onClick={() => setMobileMenuOpen(false)}
+            onClick={(e) => {
+              setMobileMenuOpen(false);
+              handleLogout(e);
+            }}
           >
             Sign out
           </a>
@@ -254,10 +253,31 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
       {/* Saved Listings / Wishlist Shortcut */}
       <HeaderSavedButton />
 
+      {/* Desktop Owner Workspace Shortcut for Owners */}
+      {isOwner && (
+        <Link
+          href="/owner"
+          style={{
+            padding: '7px 12px',
+            borderRadius: '999px',
+            background: '#ecfdf5',
+            border: '1.5px solid #a7f3d0',
+            color: '#065f46',
+            fontWeight: 700,
+            fontSize: '12.5px',
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+          }}
+          title="Open Landlord Property Workspace"
+        >
+          🏡 Owner Desk
+        </Link>
+      )}
+
       {/* Single Authoritative User Profile / Desk Button */}
       {currentUser ? (
-        <Link className="me" href="/account/profile" title="My Account & Dashboard">
-          👤 {currentUser.name || currentUser.phone || 'My Desk'}
+        <Link className="me" href="/account/activity" title="My Activity, Rented Stays & Requests">
+          👤 {currentUser.name || currentUser.phone || 'My Account'}
         </Link>
       ) : (
         <Link className="me" href="/auth">
@@ -266,7 +286,12 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
       )}
 
       {currentUser && (
-        <a className="so" href="/api/auth/logout" title="Sign out of account">
+        <a
+          className="so"
+          href="/api/auth/logout"
+          onClick={handleLogout}
+          title="Sign out of account"
+        >
           Sign out
         </a>
       )}

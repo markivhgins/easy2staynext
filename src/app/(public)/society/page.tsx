@@ -1,4 +1,5 @@
 import React from 'react';
+import { DynamicPageTitle } from '@/components/layout/DynamicPageTitle';
 import Link from 'next/link';
 import { searchListings } from '@/lib/listings';
 import { SearchWithMap } from '@/components/listings/SearchWithMap';
@@ -45,7 +46,7 @@ export default async function SocietyPage({ searchParams }: PageProps) {
             <span className="wow-pill">🏊 Clubhouses, Pools &amp; Parks</span>
             <span className="wow-pill">⚡ 100% Power Backup</span>
           </div>
-          <h1>Gated Society Stays in Noida &amp; Delhi NCR</h1>
+          <DynamicPageTitle prefix="Gated Society Stays" defaultCity="Noida" />
           <p>
             High-rise societies and premium residential townships with audited clubhouse, gym, and reserved parking privileges.
           </p>

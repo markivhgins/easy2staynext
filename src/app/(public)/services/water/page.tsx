@@ -1,10 +1,11 @@
 import React from 'react';
+import { DynamicPageTitle } from '@/components/layout/DynamicPageTitle';
 import { ServiceIntakeForm } from '@/components/ui/ServiceIntakeForm';
 
 export const metadata = {
-  title: 'RO Water Jar Delivery in Noida & Delhi NCR | Find2Stay',
+  title: 'RO Water Jar Delivery | Find2Stay',
   description:
-    'Reliable 20L and 10L sealed RO drinking water jar delivery to your doorstep across Noida and Delhi NCR.',
+    'Reliable 20L and 10L sealed RO drinking water jar delivery to your doorstep.',
 };
 
 export default function WaterServicePage() {
@@ -18,10 +19,10 @@ export default function WaterServicePage() {
               <span className="wow-pill">⚡ Tamper-Proof 20L Seals</span>
               <span className="wow-pill">⏰ On-Time Morning Delivery</span>
             </div>
-            <h1>RO Water Jars in Noida &amp; Delhi NCR</h1>
+            <DynamicPageTitle prefix="RO Water Jars" defaultCity="Noida" />
             <p>
               Regular drinking water jar delivery. Pricing, billing and returnable container deposit arrangements are
-              handled transparently by verified suppliers across Noida and Delhi NCR.
+              handled transparently by verified local suppliers.
             </p>
           </div>
         </div>

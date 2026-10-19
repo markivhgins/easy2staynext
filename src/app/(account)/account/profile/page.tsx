@@ -87,7 +87,7 @@ export default async function ProfilePage() {
               ❤️ Saved Stays
             </Link>
             <Link href="/account/activity">
-              📋 Visits &amp; Requests
+              📋 Rented Stays &amp; Visits
             </Link>
             <Link href="/pg">
               🔍 Browse Stays

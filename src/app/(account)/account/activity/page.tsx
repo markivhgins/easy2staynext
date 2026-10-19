@@ -24,39 +24,61 @@ export default async function UserActivityPage() {
 
   let enquiries: any[] = [];
   let services: any[] = [];
+  let bookings: any[] = [];
 
   try {
     const db = await getDb();
     const userId = new ObjectId(user._id);
+    const userPhoneClean = phone.replace(/\D/g, '').slice(-10);
+
     enquiries = await db
       .collection('enquiries')
-      .find({ userId })
+      .find({
+        $or: [{ userId }, { phone: { $regex: userPhoneClean } }],
+      })
       .sort({ createdAt: -1 })
       .toArray();
 
     services = await db
       .collection('serviceConnections')
-      .find({ userId })
+      .find({
+        $or: [{ userId }, { phone: { $regex: userPhoneClean } }],
+      })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    bookings = await db
+      .collection('bookings')
+      .find({
+        $or: [
+          { userId },
+          { tenantPhone: { $regex: userPhoneClean } },
+          { phone: { $regex: userPhoneClean } },
+        ],
+      })
       .sort({ createdAt: -1 })
       .toArray();
   } catch {
     // In local dev without live Atlas, keep arrays empty gracefully
   }
 
+  // If user has confirmed bookings or scheduled visits, show clear distinction
+  const confirmedStays = bookings.filter((b) => b.status === 'CONFIRMED' || b.status === 'ACTIVE' || b.status === 'RENTED');
+
   return (
     <>
       <section className="head">
         <div className="wrap">
-          <h1>My Activity &amp; Requests</h1>
+          <h1>My Stays, Visits &amp; Requests</h1>
           <p>
-            Track your scheduled property visits, callback status, and everyday relocation service connections.
+            Track your rented accommodations, scheduled on-site visits, and everyday relocation service orders.
           </p>
         </div>
       </section>
 
       <div className="wrap desk" style={{ marginTop: '24px', marginBottom: '80px', borderRadius: '18px', overflow: 'hidden', border: '1px solid var(--line)' }}>
         <aside>
-          <small>Visitor Desk</small>
+          <small>Tenant &amp; Resident Desk</small>
           <b>{displayName}</b>
           <p style={{ fontSize: '13px', color: '#BFD0FF', marginBottom: '18px' }}>
             {phone}
@@ -66,11 +88,11 @@ export default async function UserActivityPage() {
             <Link href="/account/profile">
               👤 My Profile
             </Link>
+            <Link href="/account/activity" style={{ color: '#9DB6FF', fontWeight: 700 }}>
+              📋 Rented Stays &amp; Visits
+            </Link>
             <Link href="/account/saved">
               ❤️ Saved Stays
-            </Link>
-            <Link href="/account/activity" style={{ color: '#9DB6FF', fontWeight: 700 }}>
-              📋 Visits &amp; Requests
             </Link>
             <Link href="/pg">
               🔍 Browse Stays
@@ -79,8 +101,8 @@ export default async function UserActivityPage() {
               🍲 Relocation Services
             </Link>
             {roles.includes('OWNER') && (
-              <Link href="/owner">
-                🏡 Owner Workspace
+              <Link href="/owner" style={{ color: '#6EE7B7', fontWeight: 700 }}>
+                🏡 Owner Workspace →
               </Link>
             )}
             {roles.includes('OPS') && (
@@ -99,17 +121,106 @@ export default async function UserActivityPage() {
           {/* Stats Bar */}
           <div className="stats" style={{ marginTop: 0, marginBottom: '28px' }}>
             <div>
+              <b>{confirmedStays.length}</b>
+              rented stays
+            </div>
+            <div>
               <b>{enquiries.length}</b>
               visits &amp; callbacks
             </div>
             <div>
               <b>{services.length}</b>
-              service connections
+              service orders
             </div>
           </div>
 
+          {/* 1. Track Rented & Confirmed Accommodations */}
           <h2 style={{ fontSize: '22px', marginBottom: '14px', color: 'var(--navy)' }}>
-            Property Visits &amp; Callbacks
+            🏡 My Rented Stays &amp; Active Stays
+          </h2>
+
+          {confirmedStays.length === 0 ? (
+            <div className="panel" style={{ padding: '28px 24px', borderRadius: '16px', marginBottom: '32px', background: '#f8fafc', border: '1px solid var(--line)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                <div style={{ fontSize: '2.4rem' }}>🏠</div>
+                <div style={{ flex: 1, minWidth: '220px' }}>
+                  <strong style={{ fontSize: '1rem', color: 'var(--navy)', display: 'block', marginBottom: '4px' }}>
+                    No Active Rented Stay Registered
+                  </strong>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--mut)', margin: 0, lineHeight: 1.5 }}>
+                    When you reserve a verified PG bed or flat on Find2Stay, your verified digital pass, rent due dates, landlord contact details, and move-in inspection reports will appear right here.
+                  </p>
+                </div>
+                <Link href="/pg" className="go" style={{ borderRadius: '10px', padding: '9px 18px', fontSize: '13px', whiteSpace: 'nowrap' }}>
+                  Find a Stay
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gap: '14px', marginBottom: '32px' }}>
+              {confirmedStays.map((stay) => (
+                <div
+                  key={stay._id.toString()}
+                  style={{
+                    background: '#ffffff',
+                    padding: '20px',
+                    borderRadius: '16px',
+                    border: '1.5px solid #a7f3d0',
+                    boxShadow: '0 4px 12px rgba(16,185,129,0.06)',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px', marginBottom: '12px' }}>
+                    <div>
+                      <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 8px', borderRadius: '6px', background: '#dcfce7', color: '#166534', textTransform: 'uppercase' }}>
+                        ● Active Resident
+                      </span>
+                      <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--navy)', margin: '6px 0 2px' }}>
+                        {stay.listingTitle || stay.propertyTitle || 'Verified Stay'}
+                      </h3>
+                      <div style={{ fontSize: '0.82rem', color: 'var(--mut)' }}>
+                        📍 {stay.locality || stay.address || 'Verified Locality'} · Unit / Room: <strong>{stay.roomNumber || 'Room A-102'}</strong>
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--navy)' }}>
+                        ₹{Number(stay.rent || 8500).toLocaleString('en-IN')}<small style={{ fontSize: '0.75rem', color: 'var(--mut)' }}>/mo</small>
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 700 }}>
+                        Move-in: {stay.moveInDate ? new Date(stay.moveInDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Confirmed'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', paddingTop: '12px', borderTop: '1px solid #e2e8f0' }}>
+                    {stay.ownerPhone && (
+                      <a
+                        href={`tel:${stay.ownerPhone}`}
+                        style={{
+                          fontSize: '12.5px',
+                          fontWeight: 700,
+                          padding: '6px 12px',
+                          borderRadius: '8px',
+                          background: '#f0fdf4',
+                          border: '1px solid #86efac',
+                          color: '#166534',
+                          textDecoration: 'none',
+                        }}
+                      >
+                        📞 Call Landlord ({stay.ownerPhone})
+                      </a>
+                    )}
+                    <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      🛡️ 180-Day Audited Premises · Wi-Fi &amp; RO Covered
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 2. Track Property Visits & Callbacks */}
+          <h2 style={{ fontSize: '22px', marginBottom: '14px', color: 'var(--navy)' }}>
+            📅 Property Visits &amp; Callbacks
           </h2>
 
           {enquiries.length === 0 ? (

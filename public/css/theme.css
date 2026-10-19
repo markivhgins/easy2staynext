@@ -539,3 +539,47 @@ footer{background:var(--navy);border-top:1px solid rgba(255,255,255,0.08);border
   footer a{display:block;padding:8px 0;margin:0}
 }
 html,body{overflow-x:clip}
+
+/* Checkbox and Radio fixes across all forms */
+input[type="checkbox"], input[type="radio"] {
+  width: 18px !important;
+  min-width: 18px !important;
+  max-width: 18px !important;
+  height: 18px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  flex: 0 0 18px !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+  accent-color: var(--blue, #1648E8) !important;
+  cursor: pointer !important;
+}
+
+.chk-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+  cursor: pointer !important;
+  width: 100% !important;
+}
+
+.chk-row input[type="checkbox"] {
+  margin-top: 3px !important;
+}
+
+/* List Your Property Responsive Layout */
+.lyp-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .lyp-layout {
+    grid-template-columns: 100% !important;
+    gap: 24px !important;
+  }
+}
+

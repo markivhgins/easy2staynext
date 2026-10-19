@@ -1,10 +1,11 @@
 import React from 'react';
+import { DynamicPageTitle } from '@/components/layout/DynamicPageTitle';
 import { ServiceIntakeForm } from '@/components/ui/ServiceIntakeForm';
 
 export const metadata = {
-  title: 'Tiffin & Home-Style Meal Services in Noida & Delhi NCR | Find2Stay',
+  title: 'Tiffin & Home-Style Meal Services | Find2Stay',
   description:
-    'Connect with vetted tiffin centers and home kitchens across Noida and Delhi NCR delivering healthy daily meals.',
+    'Connect with vetted tiffin centers and home kitchens delivering healthy daily meals.',
 };
 
 export default function FoodServicePage() {
@@ -18,7 +19,7 @@ export default function FoodServicePage() {
               <span className="wow-pill">⚡ Direct Kitchen Pricing</span>
               <span className="wow-pill">🍲 Free Sample Trial Options</span>
             </div>
-            <h1>Tiffin &amp; Daily Meals in Noida &amp; Delhi NCR</h1>
+            <DynamicPageTitle prefix="Tiffin &amp; Daily Meals" defaultCity="Noida" />
             <p>
               Wholesome home-style meals from approved local kitchens. Providers set their price directly: transparent menu, zero middleman markups.
             </p>

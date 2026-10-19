@@ -629,9 +629,9 @@ export default function ListYourPropertyPage() {
             </div>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '32px', alignItems: 'start' }}>
+          <div className="lyp-layout">
             {/* Form Column */}
-            <div style={{ background: '#ffffff', border: '1px solid var(--line)', borderRadius: '24px', padding: '32px', boxShadow: '0 4px 16px rgba(11,35,80,0.03)' }}>
+            <div className="lyp-card">
               {/* 3-Phase High-Level Progress Tracker (from handwritten note) */}
               <div style={{ marginBottom: '28px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -770,7 +770,7 @@ export default function ListYourPropertyPage() {
                       <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
                         Mobile Number (OTP Verification) *
                       </label>
-                      <div style={{ display: 'flex', gap: '8px' }}>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         <span style={{ padding: '10px 14px', background: '#f1f5f9', borderRadius: '10px', fontSize: '0.9rem', color: 'var(--navy)', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
                           +91
                         </span>
@@ -785,7 +785,7 @@ export default function ListYourPropertyPage() {
                             setOtpVerified(false);
                           }}
                           required
-                          style={{ flex: 1 }}
+                          style={{ flex: 1, minWidth: '160px' }}
                         />
                         {!otpVerified ? (
                           <button
@@ -860,9 +860,10 @@ export default function ListYourPropertyPage() {
 
                     {/* WhatsApp Checkbox & Input */}
                     <div>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--navy)', cursor: 'pointer' }}>
+                      <label className="chk-row" style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: 'var(--navy)', cursor: 'pointer' }}>
                         <input
                           type="checkbox"
+                          style={{ width: '18px', height: '18px', flexShrink: 0, margin: 0, accentColor: '#1d5bd8' }}
                           checked={whatsappSameAsPhone}
                           onChange={(e) => setWhatsappSameAsPhone(e.target.checked)}
                         />
@@ -896,12 +897,12 @@ export default function ListYourPropertyPage() {
 
                     {/* Ownership / Authorization Declaration */}
                     <div style={{ padding: '14px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                      <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.85rem', color: '#334155', cursor: 'pointer' }}>
+                      <label className="chk-row" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.85rem', color: '#334155', cursor: 'pointer' }}>
                         <input
                           type="checkbox"
+                          style={{ width: '18px', height: '18px', flexShrink: 0, margin: '3px 0 0 0', accentColor: '#1d5bd8' }}
                           checked={ownershipConfirmed}
                           onChange={(e) => setOwnershipConfirmed(e.target.checked)}
-                          style={{ marginTop: '3px' }}
                         />
                         <span>
                           <strong>Authorization Declaration:</strong> I confirm that I own this property or am officially authorized by the owner to manage, list, and schedule tenant visits on Find2Stay.
@@ -1048,9 +1049,10 @@ export default function ListYourPropertyPage() {
 
                     {/* Couple-friendly toggle & conditions (from handwritten note) */}
                     <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', cursor: 'pointer' }}>
+                      <label className="chk-row" style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', cursor: 'pointer' }}>
                         <input
                           type="checkbox"
+                          style={{ width: '18px', height: '18px', flexShrink: 0, margin: 0, accentColor: '#1d5bd8' }}
                           checked={coupleFriendly}
                           onChange={(e) => setCoupleFriendly(e.target.checked)}
                         />
@@ -1185,12 +1187,12 @@ export default function ListYourPropertyPage() {
 
                     {/* Public Display Privacy Control Toggle (Handwritten note requirement) */}
                     <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                      <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.85rem', color: 'var(--navy)', cursor: 'pointer' }}>
+                      <label className="chk-row" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.85rem', color: 'var(--navy)', cursor: 'pointer' }}>
                         <input
                           type="checkbox"
+                          style={{ width: '18px', height: '18px', flexShrink: 0, margin: '2px 0 0 0', accentColor: '#1d5bd8' }}
                           checked={hideExactAddress}
                           onChange={(e) => setHideExactAddress(e.target.checked)}
-                          style={{ marginTop: '2px' }}
                         />
                         <div>
                           <strong>Privacy Protection:</strong> Hide exact door/building number until visit confirmation.
@@ -1669,12 +1671,12 @@ export default function ListYourPropertyPage() {
 
                   {/* Final Declarations */}
                   <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.82rem', color: '#334155', cursor: 'pointer' }}>
+                    <label className="chk-row" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.82rem', color: '#334155', cursor: 'pointer' }}>
                       <input
                         type="checkbox"
+                        style={{ width: '18px', height: '18px', flexShrink: 0, margin: '3px 0 0 0', accentColor: '#1d5bd8' }}
                         checked={consent}
                         onChange={(e) => setConsent(e.target.checked)}
-                        style={{ marginTop: '3px' }}
                       />
                       <span>
                         <strong>Accuracy &amp; On-Site Audit Agreement:</strong> I certify that all details provided are true and accurate. I agree to permit the Find2Stay local field operations specialist to conduct an in-person room audit before public verification activation.

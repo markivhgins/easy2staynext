@@ -1,10 +1,11 @@
 import React from 'react';
+import { DynamicPageTitle } from '@/components/layout/DynamicPageTitle';
 import { ServiceIntakeForm } from '@/components/ui/ServiceIntakeForm';
 
 export const metadata = {
-  title: 'Packers & Movers in Noida & Delhi NCR | Find2Stay',
+  title: 'Packers & Movers | Find2Stay',
   description:
-    'Vetted local shifting and home relocation partners in Noida & Delhi NCR. Transparent written quotes with zero hidden charges.',
+    'Vetted local shifting and home relocation partners. Transparent written quotes with zero hidden charges.',
 };
 
 export default function MoversServicePage() {
@@ -16,12 +17,12 @@ export default function MoversServicePage() {
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
               <span className="wow-pill">📦 Zero-Damage Transit</span>
               <span className="wow-pill">⚡ Transparent Binding Quotes</span>
-              <span className="wow-pill">🚚 Delhi NCR Corridors Covered</span>
+              <span className="wow-pill">🚚 Local Corridors Covered</span>
             </div>
-            <h1>Packers &amp; Movers in Noida &amp; Delhi NCR</h1>
+            <DynamicPageTitle prefix="Packers &amp; Movers" defaultCity="Noida" />
             <p>
               Tell us about your shifting needs. Verified packers &amp; movers review your route and inventory to provide
-              competitive quotes directly to you across Noida, Greater Noida, Ghaziabad, and Gurugram.
+              competitive quotes directly to you across verified transit corridors.
             </p>
           </div>
         </div>
