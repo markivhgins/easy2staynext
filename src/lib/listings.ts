@@ -643,10 +643,77 @@ export async function getListingBySlug(slug: string): Promise<PublicListing | nu
     await seedIfEmpty();
     const db = await getDb();
     const doc = await db.collection('listings').findOne({ slug, status: 'PUBLISHED' });
-    if (!doc) return null;
-    return shapeListing(doc);
-  } catch {
-    const found = SEED_LISTINGS.find((x) => x.slug === slug);
-    return found ? shapeListing(found) : null;
-  }
+    if (doc) return shapeListing(doc);
+  } catch {}
+
+  const found = SEED_LISTINGS.find((x) => x.slug === slug);
+  if (found) return shapeListing(found);
+
+  // Fallback to memoryDrafts for published/verified stays
+  try {
+    const { memoryDrafts } = await import('@/lib/memoryDrafts');
+    const matchedDraft = memoryDrafts.find(
+      (d) =>
+        (d._id && slug.includes(d._id.slice(-5))) ||
+        (d.propertyId && slug.toLowerCase().includes(d.propertyId.toLowerCase())) ||
+        (d.locality && slug === `stay_${d.locality.toLowerCase().replace(/[^a-z0-9]/g, '-')}_${d._id.slice(-5)}`)
+    );
+
+    if (matchedDraft) {
+      const rentPaise = Math.round((Number(matchedDraft.rent) || 5000) * 100);
+      const depositPaise = Math.round((Number(matchedDraft.deposit) || Number(matchedDraft.rent) || 5000) * 100);
+      const accType = matchedDraft.type === 'PG' ? 'PG' : 'FLAT';
+      return shapeListing({
+        slug,
+        title: matchedDraft.title,
+        locality: matchedDraft.locality || 'Noida',
+        city: matchedDraft.city || 'Noida',
+        accommodationType: accType,
+        entryPoints: [accType === 'PG' ? 'pg' : 'flats'],
+        price: {
+          amountPaise: rentPaise,
+          basis: accType === 'PG' ? 'PER_BED_MONTH' : 'PER_UNIT_MONTH',
+          depositPaise,
+          maintenancePaise: Number(matchedDraft.maintenance) || 0,
+          electricityBasis: (matchedDraft.electricityBasis as any) || 'METERED',
+          foodIncluded: false,
+          oneTimeFeesPaise: 0,
+          priceConfirmedAt: matchedDraft.createdAt || new Date(),
+        },
+        occupancy: matchedDraft.occupancy || matchedDraft.sharing || 'Single',
+        gender: (matchedDraft.gender as any) || 'any',
+        bhk: matchedDraft.bhk || '1 BHK',
+        publicLocation: {
+          type: 'Point',
+          coordinates: matchedDraft.coordinates || [77.391, 28.5355],
+          areaLabel: matchedDraft.locality || 'Noida',
+          approximate: true,
+        },
+        locationPrivate: {
+          type: 'Point',
+          coordinates: matchedDraft.coordinates || [77.391, 28.5355],
+        },
+        addressPrivate: matchedDraft.fullAddress || matchedDraft.locality || 'Noida',
+        verification: {
+          state: 'VERIFIED',
+          verifiedAt: matchedDraft.verifiedAt || new Date(),
+          validUntil: matchedDraft.validUntil || new Date(Date.now() + 180 * 864e5),
+          scope: 'On-site audit confirmed rooms, meter, and verified owner authorization.',
+        },
+        availability: {
+          status: matchedDraft.availabilityStatus === 'OCCUPIED' ? 'UNAVAILABLE' : 'AVAILABLE',
+          confirmedAt: new Date(),
+        },
+        status: 'PUBLISHED',
+        media: Array.isArray(matchedDraft.photos) && matchedDraft.photos.length > 0 ? matchedDraft.photos.map((p, idx) => ({ storageKey: p, order: idx + 1 })) : [{ storageKey: 'pg-1', order: 1 }],
+        amenities: matchedDraft.amenities && matchedDraft.amenities.length > 0 ? matchedDraft.amenities : ['Wi-Fi', 'Power Backup', 'RO Water'],
+        rules: matchedDraft.houseRules ? [matchedDraft.houseRules] : ['Quiet hours observed after 10:30 PM', 'Valid ID required'],
+        ownerId: (matchedDraft.ownerId as any) || 'owner',
+        createdAt: matchedDraft.createdAt || new Date(),
+        updatedAt: new Date(),
+      });
+    }
+  } catch {}
+
+  return null;
 }

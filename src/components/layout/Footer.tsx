@@ -68,6 +68,7 @@ export const Footer: React.FC = () => {
         <h4>Company</h4>
         <Link href="/how-verification-works">How we verify</Link>
         <Link href="/list-your-property">List your property</Link>
+        <Link href="/blog">Blog &amp; Guides</Link>
         <Link href="/about">About us</Link>
         <Link href="/contact">Contact us</Link>
         <Link href="/help">Help &amp; FAQs</Link>
