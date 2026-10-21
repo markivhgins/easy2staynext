@@ -24,8 +24,8 @@ export default async function HomePage() {
               Verified Rooms, Hassle-free Shifting, Healthy Food and Clean Water – All in One Platform.
             </p>
 
-            {/* 4 Trust Badges in Frosted Glass Pills */}
-            <div className="f2s-hero-trust-badges">
+            {/* 4 Trust Badges in Frosted Glass Pills (Desktop) */}
+            <div className="f2s-hero-trust-badges desktop-badges">
               <div className="f2s-trust-pill">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" className="trust-icon">
                   <path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6z" />
