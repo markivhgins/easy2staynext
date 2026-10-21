@@ -27,10 +27,12 @@ export function HeaderSavedButton() {
     };
 
     window.addEventListener('f2s_saved_changed', handleSavedChanged);
+    window.addEventListener('f2s-wishlist-change', updateCount);
     window.addEventListener('storage', updateCount);
 
     return () => {
       window.removeEventListener('f2s_saved_changed', handleSavedChanged);
+      window.removeEventListener('f2s-wishlist-change', updateCount);
       window.removeEventListener('storage', updateCount);
     };
   }, []);

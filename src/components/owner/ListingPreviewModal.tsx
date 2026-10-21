@@ -9,8 +9,8 @@ export interface ListingPreviewData {
   locality: string;
   fullAddress: string;
   hideExactAddress: boolean;
-  landmark: string;
-  nearbyMetroOrCollege: string;
+  landmark?: string;
+  nearbyMetroOrCollege?: string;
   rent: number | string;
   deposit: number | string;
   maintenance: number | string;
@@ -19,26 +19,32 @@ export interface ListingPreviewData {
   bhk: string;
   furnishing: string;
   suitableFor: string;
-  coupleFriendly: boolean;
-  coupleConditions: string;
+  coupleFriendly?: boolean;
+  coupleConditions?: string;
   bathroomType: string;
   kitchenAvailable: boolean;
   amenities: string[];
-  rules: string[];
+  rules?: string[];
+  houseRules?: string[] | string;
+  visitorsPolicy?: string;
   photos: string[];
   photosCategorized?: Array<{ url: string; category: string }>;
   videoUrl?: string;
-  noticePeriod: string;
-  minimumStay: string;
+  noticePeriod?: string;
+  minimumStay?: string;
   availableFrom: string;
   propertyId?: string;
+  ownerName?: string;
+  ownerPhone?: string;
+  userType?: string;
 }
 
 export const ListingPreviewModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
   data: ListingPreviewData;
-}> = ({ isOpen, onClose, data }) => {
+  onSubmit?: () => void;
+}> = ({ isOpen, onClose, data, onSubmit }) => {
   if (!isOpen) return null;
 
   const displayAddress = data.hideExactAddress
@@ -269,15 +275,33 @@ export const ListingPreviewModal: React.FC<{
             </div>
           )}
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '20px' }}>
             <button
               type="button"
               onClick={onClose}
-              className="go"
-              style={{ padding: '10px 24px', borderRadius: '10px', fontSize: '0.88rem' }}
+              style={{
+                padding: '10px 20px',
+                borderRadius: '10px',
+                fontSize: '0.88rem',
+                border: '1px solid #cbd5e1',
+                background: '#fff',
+                color: '#475569',
+                cursor: 'pointer',
+                fontWeight: 600,
+              }}
             >
-              Done Previewing
+              {onSubmit ? 'Back to Edit' : 'Done Previewing'}
             </button>
+            {onSubmit && (
+              <button
+                type="button"
+                onClick={onSubmit}
+                className="go"
+                style={{ padding: '10px 24px', borderRadius: '10px', fontSize: '0.88rem' }}
+              >
+                Submit Listing Now 🚀
+              </button>
+            )}
           </div>
         </div>
       </div>

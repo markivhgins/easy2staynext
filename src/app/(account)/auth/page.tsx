@@ -255,7 +255,7 @@ function AuthContent() {
             Mobile Verification
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--mut)', marginBottom: '22px', lineHeight: 1.5 }}>
-            Enter your mobile number to receive a 6-digit one-time password (OTP).
+            Enter your mobile number to receive a 6-digit OTP. If you don&apos;t have an account yet, one will be created automatically.
           </p>
 
           <label style={{ display: 'grid', gap: '8px', marginBottom: '14px' }}>

@@ -951,15 +951,36 @@ export default function CitySelectorModal() {
               {matchingHubs.length === 0 && matchingCities.length === 0 && matchingLocalities.length === 0 ? (
                 <div
                   style={{
-                    padding: '20px',
+                    padding: '24px 20px',
                     textAlign: 'center',
-                    color: '#94a3b8',
-                    fontSize: '14px',
-                    background: '#f8fafc',
-                    borderRadius: '12px',
+                    background: '#fff1f2',
+                    border: '1px solid #fecdd3',
+                    borderRadius: '16px',
                   }}
                 >
-                  No student hubs found matching &quot;{search}&quot;. Try searching for Amity, JSS, Sharda, DU, or Sector 62.
+                  <div style={{ fontSize: '18px', marginBottom: '6px' }}>📍 Area Not Covered Yet</div>
+                  <div style={{ fontSize: '14px', color: '#9f1239', fontWeight: 700, marginBottom: '6px' }}>
+                    Find2Stay is currently not available in &quot;{search}&quot;.
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#be123c', maxWidth: '440px', margin: '0 auto 16px', lineHeight: 1.45 }}>
+                    Our verified stays and relocation services are currently active in <strong>Noida</strong>, <strong>Greater Noida</strong>, <strong>Delhi NCR</strong>, <strong>Gurugram</strong>, and <strong>Ghaziabad</strong>.
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectCity(SUPPORTED_CITIES[0])}
+                      style={{ padding: '8px 16px', background: '#0b2350', color: '#fff', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '13px' }}
+                    >
+                      Explore Noida (Active)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectCity(SUPPORTED_CITIES[1])}
+                      style={{ padding: '8px 16px', background: '#0b2350', color: '#fff', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '13px' }}
+                    >
+                      Explore Delhi NCR (Active)
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div

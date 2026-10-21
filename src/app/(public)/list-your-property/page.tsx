@@ -26,6 +26,26 @@ const AMENITIES_LIST = [
   'Separate Entrance',
 ];
 
+const AMENITIES_CONFIG = [
+  { id: 'Wi-Fi', label: 'Wi-Fi', icon: '📶' },
+  { id: 'AC', label: 'AC', icon: '❄️' },
+  { id: 'Bed', label: 'Bed', icon: '🛏️' },
+  { id: 'Wardrobe', label: 'Wardrobe', icon: '🚪' },
+  { id: 'Study Table', label: 'Study Table', icon: '📚' },
+  { id: 'Washing Machine', label: 'Washing Machine', icon: '🧺' },
+  { id: 'Parking', label: 'Parking', icon: '🅿️' },
+  { id: 'Lift', label: 'Lift', icon: '🛗' },
+  { id: 'Power Backup', label: 'Power Backup', icon: '⚡' },
+  { id: 'Tiffin/Food Nearby', label: 'Tiffin/Food Nearby', icon: '🍱' },
+  { id: 'RO Water', label: 'RO Water', icon: '💧' },
+  { id: 'Geyser', label: 'Geyser', icon: '🚿' },
+  { id: 'Visitor Allowed', label: 'Visitor Allowed', icon: '👥' },
+  { id: 'Pets Allowed', label: 'Pets Allowed', icon: '🐾' },
+  { id: 'Smoking Allowed', label: 'Smoking Allowed', icon: '🚬' },
+  { id: 'Drinking Allowed', label: 'Drinking Allowed', icon: '🍺' },
+  { id: 'Separate Entrance', label: 'Separate Entrance', icon: '🚪' },
+];
+
 const USER_TYPES = [
   { id: 'Individual Property Owner', label: 'Individual Property Owner', icon: '🏡', desc: 'Direct owner renting out flat or room' },
   { id: 'Broker / Property Dealer', label: 'Broker / Property Dealer', icon: '🤝', desc: 'Authorized agent managing listings' },
@@ -40,7 +60,7 @@ export default function ListYourPropertyPage() {
   // Step 1: Basic Information (Property type, Location, Rent, Contact number)
   // Step 2: Property Details (Photos, Amenities, Room type, Deposit, Availability)
   // Step 3: Verification & Submit (OTP, Authorisation check, Submit for review)
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
+  const [currentStep, setCurrentStep] = useState<number>(1);
 
   // --- STEP 1: Basic Information ---
   // A. Property Type & Category
@@ -75,6 +95,8 @@ export default function ListYourPropertyPage() {
 
   // --- STEP 2: Property Details ---
   // A. Room Type & Layout
+  const [subType, setSubType] = useState('Select sub type');
+  const [waterBasis, setWaterBasis] = useState('INCLUDED');
   const [furnishing, setFurnishing] = useState('Furnished');
   const [suitableFor, setSuitableFor] = useState('Boys');
   const [coupleFriendly, setCoupleFriendly] = useState(false);
@@ -518,78 +540,97 @@ export default function ListYourPropertyPage() {
   };
 
   const currentCityObj = SUPPORTED_CITIES.find((c) => c.id === selectedCityId) || SUPPORTED_CITIES[0];
+  const currentCityLocalities = currentCityObj?.localities || [];
 
   return (
-    <>
-      {/* Hero Header */}
-      <section className="head">
-        <div className="wrap">
-          <div className="hd" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
-            <div style={{ maxWidth: '640px' }}>
-              <span className="eyebrow dk" style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Verified Partner Hub
-              </span>
-              <h1 style={{ marginTop: '8px', color: '#ffffff' }}>List Your Property on Find2Stay</h1>
-              <p style={{ color: '#e0f2fe', fontSize: '1rem', lineHeight: 1.6, margin: '8px 0 20px' }}>
-                Join 500+ verified PG owners, independent landlords, and brokers in {currentCityObj.name}. Zero brokerage commissions, 180-day physical inspection seal, and authentic tenant visits.
-              </p>
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                <a
-                  href="#listing-form"
-                  className="go"
-                  style={{
-                    background: '#ffffff',
-                    color: 'var(--navy)',
-                    padding: '12px 24px',
-                    fontSize: '0.95rem',
-                    fontWeight: 700,
-                    borderRadius: '12px',
-                    textDecoration: 'none',
-                  }}
-                >
-                  🏡 Start Listing Now
-                </a>
-                <a
-                  href="#how-it-works-roadmap"
-                  style={{
-                    padding: '12px 22px',
-                    fontSize: '0.95rem',
-                    fontWeight: 700,
-                    borderRadius: '12px',
-                    background: 'rgba(255,255,255,0.12)',
-                    color: '#ffffff',
-                    border: '1px solid rgba(255,255,255,0.3)',
-                    textDecoration: 'none',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                  }}
-                >
-                  ℹ️ Verification Roadmap
-                </a>
+    <div className="f2s-list-property-page">
+      {/* ── 1. Navy Hero Header (Matches Screenshot 3) ────────────────── */}
+      <section className="f2s-owner-hero">
+        <div className="wrap f2s-owner-hero-grid">
+          {/* Left Text */}
+          <div className="f2s-owner-hero-left">
+            <h1 className="f2s-owner-hero-title">
+              List Your <span>Property</span>
+            </h1>
+            <p className="f2s-owner-hero-sub">
+              Get genuine tenants. No brokerage hassle. List your rooms, PG or property on Find2Stay and reach thousands of verified tenants.
+            </p>
+
+            <div className="f2s-owner-hero-pills">
+              <div className="f2s-owner-hero-pill">
+                <span className="f2s-pill-circle-icon">👥</span>
+                <span>Reach genuine students &amp; professionals</span>
+              </div>
+              <div className="f2s-owner-hero-pill">
+                <span className="f2s-pill-circle-icon">🛡️</span>
+                <span>Free initial listings No brokerage</span>
+              </div>
+              <div className="f2s-owner-hero-pill">
+                <span className="f2s-pill-circle-icon">📈</span>
+                <span>Easy management &amp; more bookings</span>
               </div>
             </div>
+          </div>
 
-            {/* Quick Bulk Upload Shortcut Card for Brokers */}
-            <div
-              style={{
-                background: 'rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                borderRadius: '18px',
-                padding: '22px',
-                maxWidth: '340px',
-                color: '#ffffff',
-              }}
-            >
-              <div style={{ fontSize: '1.8rem', marginBottom: '6px' }}>🏢</div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: '0 0 6px', color: '#ffffff' }}>
-                Brokers &amp; PG Operators?
-              </h3>
-              <p style={{ fontSize: '0.82rem', color: '#e0f2fe', margin: '0 0 16px', lineHeight: 1.5 }}>
-                Have 5+ flats or an entire PG building? Upload all your units at once with our validated CSV tool.
-              </p>
-              <BulkPropertyUploader />
+          {/* Center Visual: Friendly Landlord holding house model + badges */}
+          <div className="f2s-owner-hero-center">
+            <div className="f2s-owner-hero-photo-wrap">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/img/owner-hero-landlord-clean.jpg"
+                alt="Landlord partner with property"
+                className="f2s-owner-hero-photo"
+              />
+
+              {/* Playful sticker: List Now It's Free! */}
+              <div className="f2s-badge-free">
+                <span style={{ fontSize: '12px', marginRight: '3px' }}>📌</span>
+                List Now<br /><strong>It&apos;s Free!</strong>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Trusted by Property Owners Card */}
+          <div className="f2s-owner-hero-right">
+            <div className="f2s-trusted-owners-card">
+              <div className="f2s-trusted-card-header">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M12 2l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V5l8-3z" />
+                </svg>
+                <span>Trusted by Property Owners</span>
+              </div>
+              <ul className="f2s-trusted-card-list">
+                <li>
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>Verified tenants</span>
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>Safe &amp; secure process</span>
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>Manage all your listings</span>
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>Update availability anytime</span>
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>Dedicated support</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -658,54 +699,141 @@ export default function ListYourPropertyPage() {
             </div>
           </div>
         ) : (
-          <div className="lyp-layout">
-            {/* Form Column */}
-            <div className="lyp-card">
-              {/* 3-Step Wizard Navigation Tracker */}
-              <div style={{ marginBottom: '28px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '14px' }}>
-                  {[
-                    { s: 1 as const, title: 'Step 1: Basic Information', desc: 'Type, Location, Rent & Contact' },
-                    { s: 2 as const, title: 'Step 2: Property Details', desc: 'Photos, Amenities, Rooms & Rules' },
-                    { s: 3 as const, title: 'Step 3: Verification & Submit', desc: 'OTP, Authorization & Review' },
-                  ].map((item) => (
-                    <button
-                      key={item.s}
-                      type="button"
-                      onClick={() => {
-                        if (item.s === 1) setCurrentStep(1);
-                        else if (item.s === 2 && validateStep1()) setCurrentStep(2);
-                        else if (item.s === 3 && validateStep1()) setCurrentStep(3);
-                      }}
-                      style={{
-                        padding: '12px 14px',
-                        borderRadius: '14px',
-                        border: `1.5px solid ${currentStep === item.s ? 'var(--blue)' : currentStep > item.s ? '#86efac' : '#e2e8f0'}`,
-                        background: currentStep === item.s ? '#eff6ff' : currentStep > item.s ? '#f0fdf4' : '#ffffff',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        boxShadow: currentStep === item.s ? '0 4px 12px rgba(22, 72, 232, 0.12)' : 'none',
-                        transition: 'all 0.15s ease',
-                      }}
-                    >
-                      <div style={{ fontSize: '0.82rem', fontWeight: 800, color: currentStep === item.s ? 'var(--blue)' : currentStep > item.s ? '#166534' : 'var(--navy)' }}>
-                        {item.title} {currentStep > item.s ? '✓' : ''}
-                      </div>
-                      <div style={{ fontSize: '0.72rem', color: 'var(--mut)', marginTop: '2px' }}>
-                        {item.desc}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-                <div style={{ height: '6px', background: '#e2e8f0', borderRadius: '999px', overflow: 'hidden' }}>
+          <div className="f2s-list-layout-3col">
+            {/* ── Left Sidebar (Column 1) ─────────────────────────────── */}
+            <aside className="f2s-list-sidebar-left">
+              {/* Who Can List? Card */}
+              <div className="f2s-side-card">
+                <h3 className="f2s-side-card-title">Who can list?</h3>
+                <div className="f2s-who-list">
                   <div
-                    style={{
-                      height: '100%',
-                      background: 'var(--blue)',
-                      width: `${(currentStep / 3) * 100}%`,
-                      transition: 'width 0.3s ease',
-                    }}
-                  />
+                    className="f2s-who-item"
+                    style={{ cursor: 'pointer', opacity: userType === 'Individual Property Owner' ? 1 : 0.8 }}
+                    onClick={() => setUserType('Individual Property Owner')}
+                  >
+                    <div className="f2s-who-icon">🏠</div>
+                    <div className="f2s-who-text">
+                      <b>Property Owner</b>
+                      <small>Individual house or flat owner</small>
+                    </div>
+                  </div>
+
+                  <div
+                    className="f2s-who-item"
+                    style={{ cursor: 'pointer', opacity: userType === 'Broker / Property Dealer' ? 1 : 0.8 }}
+                    onClick={() => setUserType('Broker / Property Dealer')}
+                  >
+                    <div className="f2s-who-icon">👔</div>
+                    <div className="f2s-who-text">
+                      <b>Broker</b>
+                      <small>List multiple properties</small>
+                    </div>
+                  </div>
+
+                  <div
+                    className="f2s-who-item"
+                    style={{ cursor: 'pointer', opacity: userType === 'PG / Hostel Owner' ? 1 : 0.8 }}
+                    onClick={() => setUserType('PG / Hostel Owner')}
+                  >
+                    <div className="f2s-who-icon">🏢</div>
+                    <div className="f2s-who-text">
+                      <b>PG / Hostel Owner</b>
+                      <small>Boys, Girls or Co-living PGs</small>
+                    </div>
+                  </div>
+
+                  <div
+                    className="f2s-who-item"
+                    style={{ cursor: 'pointer', opacity: userType === 'Builder / Society / Property Manager' ? 1 : 0.8 }}
+                    onClick={() => setUserType('Builder / Society / Property Manager')}
+                  >
+                    <div className="f2s-who-icon">🏙️</div>
+                    <div className="f2s-who-text">
+                      <b>Builder / Society</b>
+                      <small>Apartments &amp; gated societies</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* List in 3 Simple Steps Card */}
+              <div className="f2s-side-card">
+                <h3 className="f2s-side-card-title">List in 3 Simple Steps</h3>
+                <div className="f2s-steps-mini">
+                  <div className="f2s-step-mini-item">
+                    <span className="f2s-step-mini-num">1</span>
+                    <div className="f2s-step-mini-text">
+                      <b>Fill Property Details</b>
+                      <small>Add room info, location, rent etc.</small>
+                    </div>
+                  </div>
+
+                  <div className="f2s-step-mini-item">
+                    <span className="f2s-step-mini-num">2</span>
+                    <div className="f2s-step-mini-text">
+                      <b>Add Photos &amp; Video</b>
+                      <small>Upload clear photos or video</small>
+                    </div>
+                  </div>
+
+                  <div className="f2s-step-mini-item">
+                    <span className="f2s-step-mini-num">3</span>
+                    <div className="f2s-step-mini-text">
+                      <b>Submit for Verification</b>
+                      <small>Our team will verify and publish</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Need Help? Card */}
+              <div className="f2s-side-card">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '20px' }}>🎧</span>
+                  <h3 className="f2s-side-card-title" style={{ margin: 0 }}>Need Help?</h3>
+                </div>
+                <p style={{ fontSize: '12px', color: 'var(--f2s-text-muted)', lineHeight: 1.5, margin: '0 0 12px' }}>
+                  Our team is here to help you 24x7 with listing, updates and tenant queries.
+                </p>
+                <a href="tel:+919876543210" className="f2s-contact-support-btn">
+                  <span>🎧</span>
+                  <span>Contact Support</span>
+                </a>
+              </div>
+            </aside>
+
+            {/* ── Center Main Form (Column 2) ─────────────────────────── */}
+            <main className="f2s-list-main-center">
+              {/* 3-Stage Progress Stepper Bar */}
+              <div className="f2s-form-stepper-bar">
+                <div
+                  className={`f2s-form-stepper-stage ${currentStep >= 1 ? 'active' : ''}`}
+                  onClick={() => setCurrentStep(1)}
+                >
+                  <span className="f2s-stage-badge">1</span>
+                  <span>Basic Information</span>
+                </div>
+                <div className="f2s-form-stepper-line" />
+
+                <div
+                  className={`f2s-form-stepper-stage ${currentStep >= 2 ? 'active' : ''}`}
+                  onClick={() => {
+                    if (validateStep1()) setCurrentStep(2);
+                  }}
+                >
+                  <span className="f2s-stage-badge">2</span>
+                  <span>Property Details</span>
+                </div>
+                <div className="f2s-form-stepper-line" />
+
+                <div
+                  className={`f2s-form-stepper-stage ${currentStep >= 3 ? 'active' : ''}`}
+                  onClick={() => {
+                    if (validateStep1()) setCurrentStep(3);
+                  }}
+                >
+                  <span className="f2s-stage-badge">3</span>
+                  <span>Verification &amp; Submit</span>
                 </div>
               </div>
 
@@ -732,1076 +860,924 @@ export default function ListYourPropertyPage() {
                 </div>
               )}
 
-              {/* STEP 1: Basic Information (Property Type, Location, Rent, Contact Number) */}
-              {currentStep === 1 && (
-                <div>
-                  <div style={{ marginBottom: '24px', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px' }}>
-                    <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 6px' }}>
-                      Step 1 — Basic Information
-                    </h2>
-                    <p style={{ fontSize: '0.86rem', color: 'var(--mut)', margin: 0 }}>
-                      Provide property category, location, monthly rent, and your direct contact details.
-                    </p>
+              {/* CARD 1: 1. Owner / Partner Details */}
+              <div className="f2s-form-card" id="sec-owner">
+                <div className="f2s-form-card-header">
+                  <span className="f2s-form-card-icon blue">👤</span>
+                  <div className="f2s-form-card-title-group">
+                    <h3>1. Owner / Partner Details</h3>
+                    <p>Tell us about yourself</p>
                   </div>
-
-                  {/* 1. Property Type & Title */}
-                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 14px' }}>
-                      🏷️ 1. Property Category &amp; Name
-                    </h3>
-
-                    <div style={{ display: 'grid', gap: '14px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Property / Building Name *
-                        </label>
-                        <input
-                          type="text"
-                          className="in"
-                          placeholder="e.g. Royal Palms Executive Boys PG or Green Heights 2BHK"
-                          value={title}
-                          onChange={(e) => setTitle(e.target.value)}
-                          onBlur={triggerDuplicateCheck}
-                          required
-                        />
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px' }}>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                            Property Type *
-                          </label>
-                          <select className="in" value={type} onChange={(e) => setType(e.target.value)}>
-                            <option value="PG">PG / Paying Guest</option>
-                            <option value="Hostel">Student Hostel</option>
-                            <option value="Flat">Independent Flat / Apartment</option>
-                            <option value="1RK">1 RK Studio</option>
-                            <option value="Room">Private Room in House</option>
-                          </select>
-                        </div>
-
-                        {type === 'Flat' || type === 'Room' ? (
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                              Configuration (BHK)
-                            </label>
-                            <select className="in" value={bhk} onChange={(e) => setBhk(e.target.value)}>
-                              <option value="1 RK">1 RK</option>
-                              <option value="1 BHK">1 BHK</option>
-                              <option value="2 BHK">2 BHK</option>
-                              <option value="3 BHK">3 BHK</option>
-                              <option value="4+ BHK">4+ BHK</option>
-                            </select>
-                          </div>
-                        ) : (
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                              Room Sharing Type
-                            </label>
-                            <select className="in" value={sharing} onChange={(e) => setSharing(e.target.value)}>
-                              <option value="Single">Single Room / Private</option>
-                              <option value="Double">Double Sharing</option>
-                              <option value="Triple">Triple Sharing</option>
-                              <option value="Multiple">4+ Multiple Sharing</option>
-                            </select>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 2. Location Details */}
-                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 14px' }}>
-                      📍 2. Property Location
-                    </h3>
-
-                    <div style={{ display: 'grid', gap: '14px' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px' }}>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                            Target City *
-                          </label>
-                          <select className="in" value={selectedCityId} onChange={(e) => handleCityChange(e.target.value)}>
-                            {SUPPORTED_CITIES.map((c) => (
-                              <option key={c.id} value={c.id}>
-                                {c.name} ({c.state})
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                            Sector / Locality *
-                          </label>
-                          <input
-                            type="text"
-                            className="in"
-                            placeholder="e.g. Sector 62, Knowledge Park, Saket"
-                            value={locality}
-                            onChange={(e) => setLocality(e.target.value)}
-                            onBlur={triggerDuplicateCheck}
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Full Street Address *
-                        </label>
-                        <input
-                          type="text"
-                          className="in"
-                          placeholder="Plot / House No, Street, Block, Society Name"
-                          value={fullAddress}
-                          onChange={(e) => setFullAddress(e.target.value)}
-                          onBlur={triggerDuplicateCheck}
-                          required
-                        />
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px' }}>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                            Nearby Landmark
-                          </label>
-                          <input
-                            type="text"
-                            className="in"
-                            placeholder="e.g. Near Fortis Hospital / Dominos"
-                            value={landmark}
-                            onChange={(e) => setLandmark(e.target.value)}
-                          />
-                        </div>
-
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                            Nearby Metro / College / Hub
-                          </label>
-                          <input
-                            type="text"
-                            className="in"
-                            placeholder="e.g. 500m from Sector 62 Metro"
-                            value={nearbyMetroOrCollege}
-                            onChange={(e) => setNearbyMetroOrCollege(e.target.value)}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Public Address Privacy Toggle */}
-                      <label className="chk-row" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: '#334155', cursor: 'pointer', marginTop: '4px' }}>
-                        <input
-                          type="checkbox"
-                          checked={hideExactAddress}
-                          onChange={(e) => setHideExactAddress(e.target.checked)}
-                        />
-                        <span>🔒 Mask exact house/flat number from public search (revealed to tenant only after visit confirmation)</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* 3. Rent & Charges */}
-                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 14px' }}>
-                      💰 3. Rent &amp; Charges
-                    </h3>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Monthly Rent (₹) *
-                        </label>
-                        <input
-                          type="number"
-                          className="in"
-                          placeholder="e.g. 8500"
-                          value={rent}
-                          onChange={(e) => setRent(e.target.value)}
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Security Deposit (₹)
-                        </label>
-                        <input
-                          type="number"
-                          className="in"
-                          placeholder="Default: 1 Month Rent"
-                          value={deposit}
-                          onChange={(e) => setDeposit(e.target.value)}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Electricity &amp; Water
-                        </label>
-                        <select className="in" value={electricityBasis} onChange={(e) => setElectricityBasis(e.target.value)}>
-                          <option value="METERED">Sub-metered as per usage</option>
-                          <option value="INCLUDED">Included in Monthly Rent</option>
-                          <option value="FIXED">Fixed Monthly Charge</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Brokerage (₹)
-                        </label>
-                        <input
-                          type="text"
-                          className="in"
-                          placeholder="0 (Zero Brokerage)"
-                          value={brokerage}
-                          onChange={(e) => setBrokerage(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 4. Contact Number & Partner Details */}
-                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 14px' }}>
-                      👤 4. Contact Number &amp; Partner Details
-                    </h3>
-
-                    {/* Who are you? */}
-                    <div style={{ marginBottom: '16px' }}>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '8px' }}>
-                        Who are you? (User Type)
-                      </label>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 175px), 1fr))', gap: '10px' }}>
-                        {USER_TYPES.map((u) => (
-                          <div
-                            key={u.id}
-                            onClick={() => setUserType(u.id)}
-                            style={{
-                              border: `1.5px solid ${userType === u.id ? 'var(--blue)' : '#e2e8f0'}`,
-                              borderRadius: '12px',
-                              padding: '12px',
-                              cursor: 'pointer',
-                              background: userType === u.id ? '#eff6ff' : '#ffffff',
-                              transition: 'all 0.2s ease',
-                            }}
-                          >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                              <span style={{ fontSize: '1.2rem' }}>{u.icon}</span>
-                              <strong style={{ fontSize: '0.85rem', color: 'var(--navy)' }}>{u.label}</strong>
-                            </div>
-                            <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{u.desc}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'grid', gap: '14px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Full Name *
-                        </label>
-                        <input
-                          type="text"
-                          className="in"
-                          placeholder="e.g. Sunil Kumar / Sharma Properties"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          required
-                        />
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px' }}>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                            Mobile Number *
-                          </label>
-                          <div style={{ display: 'flex', gap: '8px' }}>
-                            <span style={{ padding: '11px 12px', background: '#e2e8f0', borderRadius: '8px', fontWeight: 700, fontSize: '0.88rem', color: 'var(--navy)' }}>
-                              +91
-                            </span>
-                            <input
-                              type="tel"
-                              className="in"
-                              placeholder="9876543210"
-                              value={phone}
-                              maxLength={10}
-                              onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                              required
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                            Email Address (Optional)
-                          </label>
-                          <input
-                            type="email"
-                            className="in"
-                            placeholder="partner@find2stay.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                          />
-                        </div>
-                      </div>
-
-                      <label className="chk-row" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: '#334155', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          checked={whatsappSameAsPhone}
-                          onChange={(e) => setWhatsappSameAsPhone(e.target.checked)}
-                        />
-                        <span>WhatsApp number is the same as mobile number</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Navigation Buttons for Step 1 */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginTop: '24px' }}>
-                    <button
-                      type="button"
-                      onClick={handleSaveDraft}
-                      style={{
-                        padding: '11px 20px',
-                        borderRadius: '10px',
-                        background: '#f8fafc',
-                        border: '1.5px solid #cbd5e1',
-                        color: 'var(--navy)',
-                        fontWeight: 700,
-                        fontSize: '0.88rem',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      📄 Save Draft
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleNextToStep2}
-                      className="go"
-                      style={{
-                        padding: '12px 28px',
-                        borderRadius: '12px',
-                        fontWeight: 800,
-                        fontSize: '0.92rem',
-                      }}
-                    >
-                      Next: Step 2 — Property Details →
-                    </button>
-                  </div>
-
-                  {status === 'error' && (
-                    <div style={{ marginTop: '16px', padding: '12px 16px', background: '#fee2e2', color: '#991b1b', borderRadius: '10px', fontSize: '0.85rem' }}>
-                      {message}
-                    </div>
-                  )}
                 </div>
-              )}
 
-              {/* STEP 2: Property Details (Photos, Amenities, Room type, Deposit, Availability) */}
-              {currentStep === 2 && (
-                <div>
-                  <div style={{ marginBottom: '24px', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px' }}>
-                    <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 6px' }}>
-                      Step 2 — Property Details &amp; Amenities
-                    </h2>
-                    <p style={{ fontSize: '0.86rem', color: 'var(--mut)', margin: 0 }}>
-                      Furnishing, room facilities, move-in availability, verified amenities, and room photos.
-                    </p>
-                  </div>
-
-                  {/* 1. Room Type & Layout */}
-                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 14px' }}>
-                      🛏️ 1. Room Type &amp; Specifications
-                    </h3>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px', marginBottom: '14px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Furnishing Status
-                        </label>
-                        <select className="in" value={furnishing} onChange={(e) => setFurnishing(e.target.value)}>
-                          <option value="Furnished">Fully Furnished</option>
-                          <option value="Semi-furnished">Semi-Furnished</option>
-                          <option value="Unfurnished">Unfurnished</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Suitable For (Occupants)
-                        </label>
-                        <select className="in" value={suitableFor} onChange={(e) => setSuitableFor(e.target.value)}>
-                          <option value="Boys">Boys / Male Only</option>
-                          <option value="Girls">Girls / Female Only</option>
-                          <option value="Co-living">Co-Living / Any Gender</option>
-                          <option value="Family">Family Friendly</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Washroom / Bathroom
-                        </label>
-                        <select className="in" value={bathroomType} onChange={(e) => setBathroomType(e.target.value)}>
-                          <option value="Attached">Attached Private Washroom</option>
-                          <option value="Common">Common / Shared Washroom</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Kitchen Access
-                        </label>
-                        <select className="in" value={kitchenAvailable ? 'yes' : 'no'} onChange={(e) => setKitchenAvailable(e.target.value === 'yes')}>
-                          <option value="yes">Available / Self-Cooking Allowed</option>
-                          <option value="no">Not Available (Tiffin Only)</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Available Rooms / Beds
-                        </label>
-                        <input
-                          type="number"
-                          className="in"
-                          min="1"
-                          value={availableRooms}
-                          onChange={(e) => setAvailableRooms(e.target.value)}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Total Rooms in Property
-                        </label>
-                        <input
-                          type="number"
-                          className="in"
-                          min="1"
-                          value={totalRooms}
-                          onChange={(e) => setTotalRooms(e.target.value)}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Room Size (Sq. Ft - Optional)
-                        </label>
-                        <input
-                          type="text"
-                          className="in"
-                          placeholder="e.g. 150 sq.ft"
-                          value={roomSize}
-                          onChange={(e) => setRoomSize(e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <div style={{ marginTop: '14px' }}>
-                      <label className="chk-row" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: '#334155', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          checked={coupleFriendly}
-                          onChange={(e) => setCoupleFriendly(e.target.checked)}
-                        />
-                        <span>Couple Friendly allowed (married/unmarried with valid government IDs)</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* 2. Deposit & Move-in Terms */}
-                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 14px' }}>
-                      📅 2. Stay Terms &amp; Move-in Availability
-                    </h3>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Available From Date
-                        </label>
-                        <input
-                          type="date"
-                          className="in"
-                          min={todayDateString}
-                          value={availableFrom}
-                          onChange={(e) => setAvailableFrom(e.target.value)}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Minimum Stay Commitment
-                        </label>
-                        <select className="in" value={minimumStay} onChange={(e) => setMinimumStay(e.target.value)}>
-                          <option value="1 Month">1 Month (Flexible)</option>
-                          <option value="3 Months">3 Months</option>
-                          <option value="6 Months">6 Months</option>
-                          <option value="11 Months">11 Months (Standard Lease)</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Notice Period &amp; Move-out Rules
-                        </label>
-                        <select className="in" value={noticePeriod} onChange={(e) => setNoticePeriod(e.target.value)}>
-                          <option value="1 Month">1 Month Notice Period</option>
-                          <option value="15 Days">15 Days Notice Period</option>
-                          <option value="No Notice">No Notice (Month-to-Month)</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Live Availability Status
-                        </label>
-                        <select className="in" value={availabilityStatus} onChange={(e) => setAvailabilityStatus(e.target.value)}>
-                          <option value="AVAILABLE">Available for Immediate Booking</option>
-                          <option value="OCCUPIED">Currently Occupied</option>
-                          <option value="UNDER_REPAIR">Temporarily Unavailable</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 3. Amenities & Facilities (Covering Wi-Fi, AC, Fan, Bed, Wardrobe, Parking, Lift, Power backup, Rules) */}
-                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: 0 }}>
-                        ✨ 3. Facilities &amp; Amenities
-                      </h3>
-                      <span style={{ fontSize: '0.78rem', color: 'var(--mut)' }}>
-                        {selectedAmenities.length} selected
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 180px), 1fr))', gap: '10px', marginBottom: '16px' }}>
-                      {AMENITIES_LIST.map((amenity) => {
-                        const isChecked = selectedAmenities.includes(amenity);
-                        return (
-                          <div
-                            key={amenity}
-                            onClick={() => handleAmenityToggle(amenity)}
-                            style={{
-                              padding: '10px 12px',
-                              borderRadius: '10px',
-                              border: `1.5px solid ${isChecked ? 'var(--blue)' : '#e2e8f0'}`,
-                              background: isChecked ? '#eff6ff' : '#ffffff',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                              transition: 'all 0.15s ease',
-                            }}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={isChecked}
-                              onChange={() => {}}
-                              style={{ accentColor: 'var(--blue)', pointerEvents: 'none' }}
-                            />
-                            <span style={{ fontSize: '0.82rem', fontWeight: isChecked ? 700 : 500, color: isChecked ? 'var(--blue)' : 'var(--navy)' }}>
-                              {amenity}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {/* Rules & Policies */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px', marginBottom: '14px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Visitors Policy
-                        </label>
-                        <select className="in" value={visitorsPolicy} onChange={(e) => setVisitorsPolicy(e.target.value)}>
-                          <option value="Allowed (Daytime)">Allowed (Daytime Only)</option>
-                          <option value="Overnight Allowed">Overnight Allowed with Notice</option>
-                          <option value="Strictly Prohibited">Visitors Not Allowed</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Pets Policy
-                        </label>
-                        <select className="in" value={petsPolicy} onChange={(e) => setPetsPolicy(e.target.value)}>
-                          <option value="Not Allowed">Not Allowed</option>
-                          <option value="Allowed">Pets Welcome</option>
-                          <option value="Cats Only">Cats Only</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                          Smoking Policy
-                        </label>
-                        <select className="in" value={smokingPolicy} onChange={(e) => setSmokingPolicy(e.target.value)}>
-                          <option value="Strictly Prohibited">Strictly Prohibited</option>
-                          <option value="Balcony Only">Allowed in Balcony / Outdoors</option>
-                          <option value="Permitted">Permitted</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                        House Rules &amp; Move-Out Guidelines (Optional)
-                      </label>
-                      <textarea
-                        rows={2}
-                        className="in"
-                        placeholder="e.g. Gate closes at 11:00 PM, quiet hours after 10 PM, deposit refund within 48h of move-out inspection."
-                        value={houseRules}
-                        onChange={(e) => setHouseRules(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  {/* 4. Photos & Video Upload */}
-                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: 0 }}>
-                        📸 4. Property Photos &amp; Video Walkthrough
-                      </h3>
-                      <span style={{ fontSize: '0.78rem', color: photos.length >= 4 ? '#16a34a' : '#d97706', fontWeight: 700 }}>
-                        {photos.length} photos uploaded (Min 4 recommended)
-                      </span>
-                    </div>
-                    <p style={{ fontSize: '0.82rem', color: 'var(--mut)', margin: '0 0 16px' }}>
-                      High quality photos increase tenant inquiries by 3x. Supported formats: JPG, PNG, WEBP (Up to 10MB each).
-                    </p>
-
-                    {/* Category Selector for next upload */}
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '14px' }}>
-                      <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--navy)' }}>Upload as:</span>
-                      {['Room', 'Bathroom', 'Kitchen', 'Building / Exterior', 'Hall / Common Area'].map((cat) => (
-                        <button
-                          key={cat}
-                          type="button"
-                          onClick={() => setSelectedCategoryForNextPhoto(cat)}
-                          style={{
-                            padding: '4px 10px',
-                            borderRadius: '6px',
-                            fontSize: '0.75rem',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            border: selectedCategoryForNextPhoto === cat ? '1px solid var(--blue)' : '1px solid #cbd5e1',
-                            background: selectedCategoryForNextPhoto === cat ? '#eff6ff' : '#ffffff',
-                            color: selectedCategoryForNextPhoto === cat ? 'var(--blue)' : 'var(--navy)',
-                          }}
-                        >
-                          {cat}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div style={{ border: '2px dashed #cbd5e1', borderRadius: '14px', padding: '24px', textAlign: 'center', background: '#ffffff', marginBottom: '16px' }}>
-                      <div style={{ fontSize: '2rem', marginBottom: '6px' }}>📁</div>
-                      <label style={{ cursor: 'pointer', display: 'inline-block' }}>
-                        <span className="go" style={{ padding: '8px 18px', fontSize: '0.85rem', borderRadius: '8px' }}>
-                          {isUploading ? 'Uploading Photos...' : '+ Select Photos to Upload'}
-                        </span>
-                        <input
-                          type="file"
-                          multiple
-                          accept="image/*"
-                          style={{ display: 'none' }}
-                          onChange={handlePhotoUpload}
-                          disabled={isUploading}
-                        />
-                      </label>
-                    </div>
-
-                    {/* Photo Previews */}
-                    {photos.length > 0 && (
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 120px), 1fr))', gap: '10px', marginBottom: '16px' }}>
-                        {photos.map((p, idx) => (
-                          <div key={idx} style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', border: '1px solid #e2e8f0', aspectRatio: '4/3' }}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={p} alt={`Property upload ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            <button
-                              type="button"
-                              onClick={() => removePhoto(idx)}
-                              style={{
-                                position: 'absolute',
-                                top: '4px',
-                                right: '4px',
-                                background: 'rgba(0,0,0,0.6)',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '22px',
-                                height: '22px',
-                                fontSize: '12px',
-                                cursor: 'pointer',
-                              }}
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>
-                        🎥 Video Walkthrough Link (Optional)
-                      </label>
+                <div className="f2s-grid-2">
+                  {/* Left Column */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Full Name <span className="req">*</span></label>
                       <input
-                        type="url"
-                        className="in"
-                        placeholder="e.g. YouTube, Google Drive, or MP4 link"
-                        value={videoUrl}
-                        onChange={(e) => setVideoUrl(e.target.value)}
+                        type="text"
+                        className="f2s-input-text"
+                        placeholder="Enter your full name"
+                        value={name}
+                        onChange={(e) => {
+                          setName(e.target.value);
+                          if (!title) setTitle(`${type} in ${locality || 'Noida'}`);
+                        }}
+                        required
                       />
                     </div>
-                  </div>
 
-                  {/* Navigation Buttons for Step 2 */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginTop: '24px' }}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCurrentStep(1);
-                        document.getElementById('listing-form')?.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                      style={{
-                        padding: '11px 20px',
-                        borderRadius: '10px',
-                        background: '#f1f5f9',
-                        border: '1px solid #cbd5e1',
-                        color: 'var(--navy)',
-                        fontWeight: 600,
-                        fontSize: '0.88rem',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      ← Back to Basic Info
-                    </button>
-
-                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                      <button
-                        type="button"
-                        onClick={handleSaveDraft}
-                        style={{
-                          padding: '11px 20px',
-                          borderRadius: '10px',
-                          background: '#f8fafc',
-                          border: '1.5px solid #cbd5e1',
-                          color: 'var(--navy)',
-                          fontWeight: 700,
-                          fontSize: '0.88rem',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        📄 Save Draft
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={handleNextToStep3}
-                        className="go"
-                        style={{
-                          padding: '12px 28px',
-                          borderRadius: '12px',
-                          fontWeight: 800,
-                          fontSize: '0.92rem',
-                        }}
-                      >
-                        Next: Step 3 — Verification &amp; Submit →
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* STEP 3: Verification & Submit (OTP, Authorisation Check, Submission & Property ID) */}
-              {currentStep === 3 && (
-                <div>
-                  <div style={{ marginBottom: '24px', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px' }}>
-                    <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 6px' }}>
-                      Step 3 — Verification &amp; Submit
-                    </h2>
-                    <p style={{ fontSize: '0.86rem', color: 'var(--mut)', margin: 0 }}>
-                      Complete contact OTP authorization, review platform policies, and submit for on-site inspection.
-                    </p>
-                  </div>
-
-                  {/* 1. Mobile OTP Authentication */}
-                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 8px' }}>
-                      📱 1. Mobile OTP Authorization
-                    </h3>
-                    <p style={{ fontSize: '0.82rem', color: 'var(--mut)', margin: '0 0 14px' }}>
-                      Confirm your direct mobile number (+91 {phone || 'XXXXXXXXXX'}) to prevent unauthorized listings.
-                    </p>
-
-                    {otpVerified ? (
-                      <div style={{ padding: '12px 16px', background: '#dcfce7', border: '1px solid #86efac', borderRadius: '10px', color: '#166534', fontWeight: 700, fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span>✓</span> Mobile Number (+91 {phone}) Authenticated via OTP
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Mobile Number <span className="req">*</span></label>
+                      <div className="f2s-input-with-prefix">
+                        <span className="f2s-input-prefix">+91</span>
+                        <input
+                          type="tel"
+                          placeholder="Enter mobile number"
+                          value={phone}
+                          maxLength={10}
+                          onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="f2s-btn-get-otp"
+                          onClick={handleSendOtp}
+                          disabled={otpLoading}
+                        >
+                          {otpLoading ? 'Sending...' : otpVerified ? 'Verified ✓' : 'Get OTP'}
+                        </button>
                       </div>
-                    ) : (
-                      <div>
-                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                      {otpSent && !otpVerified && (
+                        <div style={{ marginTop: '8px', display: 'flex', gap: '8px' }}>
+                          <input
+                            type="text"
+                            placeholder="6-digit OTP"
+                            value={otpCode}
+                            maxLength={6}
+                            onChange={(e) => setOtpCode(e.target.value)}
+                            className="f2s-input-text"
+                            style={{ maxWidth: '140px' }}
+                          />
                           <button
                             type="button"
-                            onClick={handleSendOtp}
+                            onClick={handleVerifyOtp}
                             disabled={otpLoading}
                             style={{
-                              padding: '10px 18px',
+                              background: 'var(--f2s-blue)',
+                              color: '#fff',
+                              border: 'none',
+                              padding: '8px 14px',
                               borderRadius: '8px',
-                              background: '#eff6ff',
-                              border: '1.5px solid #bfdbfe',
-                              color: 'var(--blue)',
+                              fontSize: '12px',
                               fontWeight: 700,
-                              fontSize: '0.85rem',
                               cursor: 'pointer',
                             }}
                           >
-                            {otpLoading ? 'Sending...' : otpSent ? '↻ Resend OTP' : 'Send Verification OTP'}
+                            Verify
                           </button>
-
                           <button
                             type="button"
                             onClick={handleAutofillOtp}
                             style={{
-                              padding: '10px 18px',
+                              background: '#f1f5f9',
+                              border: '1px solid #cbd5e1',
+                              padding: '8px 10px',
                               borderRadius: '8px',
-                              background: '#fef3c7',
-                              border: '1.5px solid #fde68a',
-                              color: '#92400e',
-                              fontWeight: 700,
-                              fontSize: '0.85rem',
+                              fontSize: '11px',
                               cursor: 'pointer',
                             }}
                           >
-                            ⚡ Autofill OTP (Showcase Demo)
+                            Demo OTP
                           </button>
                         </div>
+                      )}
+                    </div>
 
-                        {otpSent && (
-                          <div style={{ display: 'flex', gap: '8px', maxWidth: '300px', marginTop: '10px' }}>
-                            <input
-                              type="text"
-                              className="in"
-                              placeholder="Enter 6-digit OTP"
-                              maxLength={6}
-                              value={otpCode}
-                              onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                            />
-                            <button
-                              type="button"
-                              onClick={handleVerifyOtp}
-                              disabled={otpLoading}
-                              className="go"
-                              style={{ padding: '10px 18px', borderRadius: '8px', fontSize: '0.85rem' }}
-                            >
-                              Verify
-                            </button>
-                          </div>
-                        )}
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">WhatsApp Number (Optional)</label>
+                      <div className="f2s-input-with-prefix">
+                        <span className="f2s-input-prefix">+91</span>
+                        <input
+                          type="tel"
+                          placeholder="Enter WhatsApp number"
+                          value={whatsapp}
+                          maxLength={10}
+                          onChange={(e) => setWhatsapp(e.target.value.replace(/\D/g, ''))}
+                        />
                       </div>
-                    )}
+                    </div>
                   </div>
 
-                  {/* 2. Ownership & Authorization Check */}
-                  <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 14px' }}>
-                      ⚖️ 2. Ownership Declaration &amp; Audit Agreement
-                    </h3>
+                  {/* Right Column */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">I am a <span className="req">*</span></label>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
+                        {[
+                          { id: 'Individual Property Owner', label: 'Property Owner' },
+                          { id: 'Broker / Property Dealer', label: 'Broker' },
+                          { id: 'PG / Hostel Owner', label: 'PG / Hostel Owner' },
+                          { id: 'Builder / Society / Property Manager', label: 'Builder / Society' },
+                        ].map((u) => (
+                          <label key={u.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#334155', cursor: 'pointer' }}>
+                            <input
+                              type="radio"
+                              name="ownerTypeRadio"
+                              checked={userType === u.id}
+                              onChange={() => setUserType(u.id)}
+                            />
+                            <span>{u.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
 
-                    <div style={{ display: 'grid', gap: '14px' }}>
-                      <label className="chk-row" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.84rem', color: '#1e293b', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          checked={ownershipConfirmed}
-                          onChange={(e) => setOwnershipConfirmed(e.target.checked)}
-                          style={{ marginTop: '3px' }}
-                        />
-                        <span>
-                          <strong>Ownership / Authorisation Check:</strong> I declare under penalty of deactivation that I am the genuine legal owner, operator, or formally authorized representative with full power to list and lease this property on Find2Stay.
-                        </span>
-                      </label>
+                    <div className="f2s-field-group" style={{ marginTop: 'auto' }}>
+                      <label className="f2s-field-label">Email (Optional)</label>
+                      <input
+                        type="email"
+                        className="f2s-input-text"
+                        placeholder="Enter your email address"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-                      <label className="chk-row" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.84rem', color: '#1e293b', cursor: 'pointer' }}>
+              {/* CARD 2: 2. Property Details */}
+              <div className="f2s-form-card" id="sec-property">
+                <div className="f2s-form-card-header">
+                  <span className="f2s-form-card-icon blue">🏠</span>
+                  <div className="f2s-form-card-title-group">
+                    <h3>2. Property Details</h3>
+                    <p>Tell us about your property</p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {/* Row 1: Property Type, Sub Type, Furnishing */}
+                  <div className="f2s-grid-3">
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Property Type <span className="req">*</span></label>
+                      <select className="f2s-select" value={type} onChange={(e) => setType(e.target.value)}>
+                        <option value="PG">PG / Paying Guest</option>
+                        <option value="Room">Room</option>
+                        <option value="1RK">1 RK</option>
+                        <option value="1BHK">1 BHK</option>
+                        <option value="2BHK">2 BHK</option>
+                        <option value="Flat">Independent Flat</option>
+                        <option value="Hostel">Hostel</option>
+                      </select>
+                    </div>
+
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Sub Type <span className="req">*</span></label>
+                      <select className="f2s-select" value={subType} onChange={(e) => setSubType(e.target.value)}>
+                        <option value="Select sub type">Select sub type</option>
+                        <option value="Independent Room">Independent Room</option>
+                        <option value="Shared Room">Shared Room</option>
+                        <option value="Full Apartment">Full Apartment</option>
+                        <option value="Studio Apartment">Studio Apartment</option>
+                      </select>
+                    </div>
+
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Furnishing <span className="req">*</span></label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '6px' }}>
+                        {['Furnished', 'Semi-furnished', 'Unfurnished'].map((f) => (
+                          <label key={f} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#334155', cursor: 'pointer' }}>
+                            <input
+                              type="radio"
+                              name="furnishingOpt"
+                              checked={furnishing === f}
+                              onChange={() => setFurnishing(f)}
+                            />
+                            <span>{f}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Row 2: Sharing Type, Suitable For */}
+                  <div className="f2s-grid-2">
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Sharing Type <span className="req">*</span></label>
+                      <div className="f2s-radio-pills">
+                        {['Single', 'Double', 'Triple', 'Multiple'].map((s) => (
+                          <button
+                            key={s}
+                            type="button"
+                            className={`f2s-radio-pill-item ${sharing === s ? 'active' : ''}`}
+                            onClick={() => setSharing(s)}
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Suitable For <span className="req">*</span></label>
+                      <div className="f2s-radio-pills">
+                        {['Boys', 'Girls', 'Co-living', 'Family'].map((sf) => (
+                          <button
+                            key={sf}
+                            type="button"
+                            className={`f2s-radio-pill-item ${suitableFor === sf ? 'active' : ''}`}
+                            onClick={() => setSuitableFor(sf)}
+                          >
+                            {sf}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Row 3: Couple Friendly, Bathroom, Kitchen */}
+                  <div className="f2s-grid-3">
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Couple Friendly <span className="req">*</span></label>
+                      <div style={{ display: 'flex', gap: '14px', marginTop: '6px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12.5px', cursor: 'pointer' }}>
+                          <input type="radio" name="coupleFriendlyRadio" checked={coupleFriendly} onChange={() => setCoupleFriendly(true)} />
+                          <span>Yes</span>
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12.5px', cursor: 'pointer' }}>
+                          <input type="radio" name="coupleFriendlyRadio" checked={!coupleFriendly} onChange={() => setCoupleFriendly(false)} />
+                          <span>No</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Bathroom <span className="req">*</span></label>
+                      <div style={{ display: 'flex', gap: '14px', marginTop: '6px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12.5px', cursor: 'pointer' }}>
+                          <input type="radio" name="bathTypeRadio" checked={bathroomType === 'Attached'} onChange={() => setBathroomType('Attached')} />
+                          <span>Attached</span>
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12.5px', cursor: 'pointer' }}>
+                          <input type="radio" name="bathTypeRadio" checked={bathroomType === 'Common'} onChange={() => setBathroomType('Common')} />
+                          <span>Common</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Kitchen <span className="req">*</span></label>
+                      <div style={{ display: 'flex', gap: '14px', marginTop: '6px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12.5px', cursor: 'pointer' }}>
+                          <input type="radio" name="kitchenRadio" checked={kitchenAvailable} onChange={() => setKitchenAvailable(true)} />
+                          <span>Available</span>
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12.5px', cursor: 'pointer' }}>
+                          <input type="radio" name="kitchenRadio" checked={!kitchenAvailable} onChange={() => setKitchenAvailable(false)} />
+                          <span>Not Available</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* CARD 3: 3. Location Details */}
+              <div className="f2s-form-card" id="sec-location">
+                <div className="f2s-form-card-header">
+                  <span className="f2s-form-card-icon orange">📍</span>
+                  <div className="f2s-form-card-title-group">
+                    <h3>3. Location Details</h3>
+                    <p>Help tenants find your property easily</p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '18px', alignItems: 'start' }}>
+                  {/* Left Location Inputs */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div className="f2s-grid-2">
+                      <div className="f2s-field-group">
+                        <label className="f2s-field-label">City <span className="req">*</span></label>
+                        <select className="f2s-select" value={selectedCityId} onChange={(e) => handleCityChange(e.target.value)}>
+                          {SUPPORTED_CITIES.map((c) => (
+                            <option key={c.id} value={c.id}>
+                              {c.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="f2s-field-group">
+                        <label className="f2s-field-label">Sector / Locality <span className="req">*</span></label>
+                        <select
+                          className="f2s-select"
+                          value={locality}
+                          onChange={(e) => {
+                            setLocality(e.target.value);
+                            if (!title) setTitle(`${type} in ${e.target.value}`);
+                          }}
+                          onBlur={triggerDuplicateCheck}
+                          required
+                        >
+                          <option value="">Select sector/locality</option>
+                          {currentCityLocalities.map((loc) => (
+                            <option key={loc.name} value={loc.name}>
+                              {loc.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Full Address <span className="req">*</span></label>
+                      <input
+                        type="text"
+                        className="f2s-input-text"
+                        placeholder="Enter full address (House no., sector, landmark etc.)"
+                        value={fullAddress}
+                        onChange={(e) => setFullAddress(e.target.value)}
+                        onBlur={triggerDuplicateCheck}
+                        required
+                      />
+                    </div>
+
+                    <div className="f2s-grid-2">
+                      <div className="f2s-field-group">
+                        <label className="f2s-field-label">Nearby Landmark</label>
                         <input
-                          type="checkbox"
-                          checked={consent}
-                          onChange={(e) => setConsent(e.target.checked)}
-                          style={{ marginTop: '3px' }}
+                          type="text"
+                          className="f2s-input-text"
+                          placeholder="e.g. Near Metro Station, Office, College"
+                          value={landmark}
+                          onChange={(e) => setLandmark(e.target.value)}
                         />
-                        <span>
-                          <strong>180-Day Audit Seal Agreement:</strong> I agree to allow Find2Stay field verification specialists to conduct an on-site physical room, safety, and RO water audit prior to full verified badge activation.
-                        </span>
+                      </div>
+
+                      <div className="f2s-field-group">
+                        <label className="f2s-field-label">Nearby Metro Station</label>
+                        <select
+                          className="f2s-select"
+                          value={nearbyMetroOrCollege}
+                          onChange={(e) => setNearbyMetroOrCollege(e.target.value)}
+                        >
+                          <option value="">Select metro station (optional)</option>
+                          <option value="Noida Electronic City">Noida Electronic City</option>
+                          <option value="Sector 62 Metro">Sector 62 Metro</option>
+                          <option value="Botanical Garden">Botanical Garden</option>
+                          <option value="Sector 18 Noida">Sector 18 Noida</option>
+                          <option value="Sector 52 Metro">Sector 52 Metro</option>
+                          <option value="Pari Chowk">Pari Chowk</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Mask Exact Address Toggle */}
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '7px', fontSize: '11.5px', color: '#64748b', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={hideExactAddress}
+                        onChange={(e) => setHideExactAddress(e.target.checked)}
+                      />
+                      <span>🔒 Mask exact house number on public search (shared only upon visit booking)</span>
+                    </label>
+                  </div>
+
+                  {/* Right Map Preview Container */}
+                  <div
+                    style={{
+                      height: '180px',
+                      borderRadius: '14px',
+                      overflow: 'hidden',
+                      position: 'relative',
+                      border: '1px solid #cbd5e1',
+                      backgroundImage: 'url(https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=400)',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <div style={{ fontSize: '36px', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.3))' }}>📍</div>
+                    </div>
+                    <div style={{ position: 'relative', zIndex: 2, padding: '10px', textAlign: 'center', background: 'linear-gradient(to top, rgba(0,0,0,0.65), transparent)' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const inputLoc = prompt('Set property location pin on map (Locality / Coordinates):', locality || 'Sector 62, Noida');
+                          if (inputLoc) setLocality(inputLoc);
+                        }}
+                        style={{
+                          background: 'var(--f2s-blue)',
+                          color: '#ffffff',
+                          border: 'none',
+                          padding: '8px 16px',
+                          borderRadius: '8px',
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
+                        }}
+                      >
+                        📍 Pick Location on Map
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* CARD 4: 4. Rent & Availability */}
+              <div className="f2s-form-card" id="sec-rent">
+                <div className="f2s-form-card-header">
+                  <span className="f2s-form-card-icon orange">₹</span>
+                  <div className="f2s-form-card-title-group">
+                    <h3>4. Rent &amp; Availability</h3>
+                    <p>Set your pricing and availability details</p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {/* Row 1: Monthly Rent, Security Deposit, Maintenance */}
+                  <div className="f2s-grid-3">
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Monthly Rent (₹) <span className="req">*</span></label>
+                      <input
+                        type="number"
+                        className="f2s-input-text"
+                        placeholder="Enter monthly rent"
+                        value={rent}
+                        onChange={(e) => setRent(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Security Deposit (₹) <span className="req">*</span></label>
+                      <input
+                        type="number"
+                        className="f2s-input-text"
+                        placeholder="Enter security deposit"
+                        value={deposit}
+                        onChange={(e) => setDeposit(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Maintenance Charges (₹)</label>
+                      <input
+                        type="number"
+                        className="f2s-input-text"
+                        placeholder="Enter maintenance charges"
+                        value={maintenance}
+                        onChange={(e) => setMaintenance(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Row 2: Electricity Charges, Water Charges, Brokerage */}
+                  <div className="f2s-grid-3">
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Electricity Charges</label>
+                      <select className="f2s-select" value={electricityBasis} onChange={(e) => setElectricityBasis(e.target.value)}>
+                        <option value="INCLUDED">Included</option>
+                        <option value="METERED">Separate (Metered)</option>
+                        <option value="FIXED">Fixed</option>
+                      </select>
+                    </div>
+
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Water Charges</label>
+                      <select className="f2s-select" value={waterBasis} onChange={(e) => setWaterBasis(e.target.value)}>
+                        <option value="INCLUDED">Included</option>
+                        <option value="SEPARATE">Separate</option>
+                      </select>
+                    </div>
+
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Brokerage (if any)</label>
+                      <input
+                        type="text"
+                        className="f2s-input-text"
+                        placeholder="Enter brokerage amount"
+                        value={brokerage}
+                        onChange={(e) => setBrokerage(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Row 3: Minimum Stay, Available From, Number of Rooms */}
+                  <div className="f2s-grid-3">
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Minimum Stay Duration</label>
+                      <select className="f2s-select" value={minimumStay} onChange={(e) => setMinimumStay(e.target.value)}>
+                        <option value="1 Month">1 Month</option>
+                        <option value="3 Months">3 Months</option>
+                        <option value="6 Months">6 Months</option>
+                        <option value="11 Months">11 Months</option>
+                      </select>
+                    </div>
+
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Available From <span className="req">*</span></label>
+                      <input
+                        type="date"
+                        className="f2s-input-text"
+                        value={availableFrom || todayDateString}
+                        onChange={(e) => setAvailableFrom(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="f2s-field-group">
+                      <label className="f2s-field-label">Number of Rooms <span className="req">*</span></label>
+                      <input
+                        type="number"
+                        className="f2s-input-text"
+                        placeholder="Enter number of rooms"
+                        value={totalRooms}
+                        onChange={(e) => setTotalRooms(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* CARD 5: 5. Amenities & Rules */}
+              <div className="f2s-form-card" id="sec-amenities">
+                <div className="f2s-form-card-header">
+                  <span className="f2s-form-card-icon green">⚙️</span>
+                  <div className="f2s-form-card-title-group">
+                    <h3>5. Amenities &amp; Rules</h3>
+                    <p>Select facilities available at the property</p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div className="f2s-amenities-16-grid">
+                    {AMENITIES_CONFIG.map((item) => {
+                      const isChecked = selectedAmenities.includes(item.id);
+                      return (
+                        <div
+                          key={item.id}
+                          role="checkbox"
+                          aria-checked={isChecked}
+                          tabIndex={0}
+                          onClick={() => handleAmenityToggle(item.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === ' ' || e.key === 'Enter') {
+                              e.preventDefault();
+                              handleAmenityToggle(item.id);
+                            }
+                          }}
+                          className={`f2s-amenity-tile ${isChecked ? 'active' : ''}`}
+                        >
+                          <div className={`f2s-amenity-check-box ${isChecked ? 'checked' : ''}`}>
+                            {isChecked ? (
+                              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#ffffff" strokeWidth="3.2">
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            ) : null}
+                          </div>
+                          <span className="f2s-amenity-tile-icon">{item.icon}</span>
+                          <span className="f2s-amenity-tile-label">{item.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="f2s-field-group" style={{ marginTop: '10px' }}>
+                    <label className="f2s-field-label" style={{ fontWeight: 700, fontSize: '13px', color: 'var(--f2s-navy)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span>📜</span>
+                      <span>House Rules (Optional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="f2s-input-text"
+                      placeholder="e.g. No late night entry, vegetarian only, no smoking, etc."
+                      value={houseRules}
+                      onChange={(e) => setHouseRules(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* CARD 6: 6. Photos & Video */}
+              <div className="f2s-form-card" id="sec-photos">
+                <div className="f2s-form-card-header">
+                  <span className="f2s-form-card-icon blue">📷</span>
+                  <div className="f2s-form-card-title-group">
+                    <h3>6. Photos &amp; Video</h3>
+                    <p>Upload clear photos and video for better visibility</p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '16px', alignItems: 'stretch' }}>
+                  {/* Left Box: Upload Photos */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <label className="f2s-photo-uploader-box">
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handlePhotoUpload}
+                        style={{ display: 'none' }}
+                      />
+                      <div style={{ fontSize: '26px', color: 'var(--f2s-blue)' }}>☁️⬆️</div>
+                      <div style={{ fontWeight: 800, fontSize: '13.5px', color: 'var(--f2s-navy)', marginTop: '4px' }}>
+                        Upload Photos
+                      </div>
+                      <div style={{ fontSize: '11px', color: '#64748b' }}>
+                        Drag &amp; drop images or click to upload
+                      </div>
+                      <div style={{ fontSize: '10px', color: '#94a3b8' }}>
+                        (At least 4–6 clear photos) • JPG, PNG (Max 5MB each)
+                      </div>
+                    </label>
+
+                    {/* Pre-set / Uploaded Category Thumbnails */}
+                    <div className="f2s-thumbnails-preview-row">
+                      {[
+                        { label: 'Room', img: photos[0] || 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&q=80&w=200' },
+                        { label: 'Bathroom', img: photos[1] || 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=200' },
+                        { label: 'Kitchen', img: photos[2] || 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=200' },
+                        { label: 'Building', img: photos[3] || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=200' },
+                      ].map((t, idx) => (
+                        <div key={idx} className="f2s-thumbnail-card">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={t.img} alt={t.label} className="f2s-thumbnail-img" />
+                          <span className="f2s-thumbnail-label">{t.label}</span>
+                        </div>
+                      ))}
+
+                      <label
+                        className="f2s-thumbnail-card"
+                        style={{
+                          border: '1.5px dashed var(--f2s-blue)',
+                          background: '#EFF6FF',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexDirection: 'column',
+                          color: 'var(--f2s-blue)',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                        }}
+                      >
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          onChange={handlePhotoUpload}
+                          style={{ display: 'none' }}
+                        />
+                        <span style={{ fontSize: '16px' }}>+</span>
+                        <span>Add More</span>
                       </label>
                     </div>
                   </div>
 
-                  {/* 3. Submission & Property Identification & QR Code Compliance Notice */}
-                  <div style={{ padding: '18px 20px', background: '#eff6ff', borderRadius: '16px', border: '1.5px solid #bfdbfe', marginBottom: '24px' }}>
-                    <h4 style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--blue)', margin: '0 0 6px' }}>
-                      📋 Submission &amp; Property Identification (Requirement 8 &amp; 9)
-                    </h4>
-                    <p style={{ fontSize: '0.82rem', color: '#1e40af', lineHeight: 1.6, margin: 0 }}>
-                      Upon clicking <strong>Submit for Verification</strong>, your listing will be registered with a unique Property ID (e.g. <code>F2S-NOI-XXXXX</code>) and marked <strong>PENDING_VERIFICATION</strong>.
-                      <br />
-                      <strong>Important QR Code Policy:</strong> In accordance with Find2Stay platform integrity rules, official printable Verified QR Codes and gate posters are generated exclusively for listings that have passed the physical inspection audit.
+                  {/* Right Box: Video Upload */}
+                  <div
+                    style={{
+                      background: '#FFF1F2',
+                      border: '1px solid #FFE4E6',
+                      borderRadius: '14px',
+                      padding: '18px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      textAlign: 'center',
+                      gap: '10px',
+                    }}
+                  >
+                    <div style={{ fontSize: '28px' }}>📹</div>
+                    <div style={{ fontSize: '13.5px', fontWeight: 800, color: '#9F1239' }}>
+                      Upload Video (Recommended)
+                    </div>
+                    <p style={{ fontSize: '11.5px', color: '#BE123C', margin: 0 }}>
+                      Add a short video walkthrough (30 sec – 2 min)
                     </p>
-                  </div>
-
-                  {/* 4. Action Buttons */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                     <button
                       type="button"
                       onClick={() => {
-                        setCurrentStep(2);
-                        document.getElementById('listing-form')?.scrollIntoView({ behavior: 'smooth' });
+                        const url = prompt('Paste YouTube/Drive link or upload video:', videoUrl || '');
+                        if (url !== null) setVideoUrl(url);
                       }}
                       style={{
-                        padding: '11px 20px',
-                        borderRadius: '10px',
-                        background: '#f1f5f9',
-                        border: '1px solid #cbd5e1',
-                        color: 'var(--navy)',
-                        fontWeight: 600,
-                        fontSize: '0.88rem',
+                        background: '#ffffff',
+                        border: '1px solid #F43F5E',
+                        color: '#E11D48',
+                        padding: '8px 16px',
+                        borderRadius: '8px',
+                        fontSize: '12.5px',
+                        fontWeight: 700,
                         cursor: 'pointer',
+                        marginTop: '4px',
                       }}
                     >
-                      ← Back to Property Details
+                      {videoUrl ? 'Video Linked ✓' : 'Upload Video'}
                     </button>
-
-                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                      {/* Save Draft */}
-                      <button
-                        type="button"
-                        onClick={handleSaveDraft}
-                        disabled={status === 'loading'}
-                        style={{
-                          padding: '11px 20px',
-                          borderRadius: '10px',
-                          background: '#f8fafc',
-                          border: '1.5px solid #cbd5e1',
-                          color: 'var(--navy)',
-                          fontSize: '0.88rem',
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        📄 Save as Draft
-                      </button>
-
-                      {/* Preview Listing Modal */}
-                      <button
-                        type="button"
-                        onClick={() => setIsPreviewOpen(true)}
-                        style={{
-                          padding: '11px 20px',
-                          borderRadius: '10px',
-                          background: '#eff6ff',
-                          border: '1.5px solid #bfdbfe',
-                          color: 'var(--blue)',
-                          fontSize: '0.88rem',
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        👁️ Preview Listing
-                      </button>
-
-                      {/* Submit for Verification */}
-                      <button
-                        type="button"
-                        onClick={handleSubmit}
-                        disabled={status === 'loading'}
-                        className="go"
-                        style={{
-                          padding: '12px 28px',
-                          borderRadius: '12px',
-                          fontSize: '0.92rem',
-                          fontWeight: 800,
-                        }}
-                      >
-                        {status === 'loading' ? 'Submitting...' : '🚀 Submit for Verification'}
-                      </button>
-                    </div>
                   </div>
-
-                  {status === 'error' && (
-                    <div style={{ marginTop: '16px', padding: '12px 16px', background: '#fee2e2', color: '#991b1b', borderRadius: '10px', fontSize: '0.85rem' }}>
-                      {message}
-                    </div>
-                  )}
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* 10. Help / Sidebar ("Why List on Find2Stay?") */}
-            <div className="lyp-sidebar">
-              <div
-                style={{
-                  background: '#ffffff',
-                  border: '1px solid var(--line)',
-                  borderRadius: '20px',
-                  padding: '24px',
-                  boxShadow: '0 2px 8px rgba(11,35,80,0.03)',
-                  marginBottom: '20px',
-                }}
-              >
-                <div style={{ fontSize: '1.5rem', marginBottom: '6px' }}>🛡️</div>
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 10px' }}>
-                  Why List on Find2Stay?
-                </h3>
-                <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '0.85rem', color: '#475569', lineHeight: 1.8 }}>
-                  <li><strong>Zero Brokerage:</strong> Connect directly with verified student &amp; working professional tenants.</li>
-                  <li><strong>180-Day Audit Seal:</strong> On-site verified stays receive 3x higher booking request rates.</li>
-                  <li><strong>Multi-Property Hub:</strong> Manage individual rooms, full floors, or entire societies from one desk.</li>
-                  <li><strong>Verified QR Badges:</strong> Display official QR posters at your property gate for instant booking inquiries.</li>
+              {/* Legal Confirmation and Bottom Action Buttons */}
+              <div style={{ marginTop: '4px' }}>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12px', color: '#475569', cursor: 'pointer', marginBottom: '16px' }}>
+                  <input
+                    type="checkbox"
+                    checked={ownershipConfirmed}
+                    onChange={(e) => {
+                      setOwnershipConfirmed(e.target.checked);
+                      setConsent(e.target.checked);
+                    }}
+                    style={{ marginTop: '2px' }}
+                  />
+                  <span>
+                    I confirm that the information provided is correct and I am authorized to list this property. I agree to Find2Stay&apos;s <Link href="/terms" style={{ color: 'var(--f2s-blue)', textDecoration: 'underline' }}>Terms &amp; Conditions</Link>.
+                  </span>
+                </label>
+
+                {status === 'error' && (
+                  <div style={{ marginBottom: '16px', padding: '12px 16px', background: '#fee2e2', color: '#991b1b', borderRadius: '10px', fontSize: '0.85rem' }}>
+                    {message}
+                  </div>
+                )}
+
+                <div className="f2s-form-bottom-actions">
+                  <button
+                    type="button"
+                    onClick={handleSaveDraft}
+                    disabled={status === 'loading'}
+                    className="f2s-btn-draft"
+                  >
+                    Save as Draft
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsPreviewOpen(true)}
+                    style={{
+                      padding: '12px 18px',
+                      borderRadius: '10px',
+                      border: '1px solid #cbd5e1',
+                      background: '#ffffff',
+                      color: '#334155',
+                      fontSize: '13.5px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    👁️ Preview
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={status === 'loading'}
+                    className="f2s-btn-submit-main"
+                  >
+                    <span>{status === 'loading' ? 'Submitting...' : 'Submit for Verification'}</span>
+                    <span>→</span>
+                  </button>
+                </div>
+              </div>
+
+            </main>
+
+            {/* ── Right Sidebar (Column 3 - Matches Screenshot 3) ─────── */}
+            <aside className="f2s-list-sidebar-right">
+              {/* Why List on Find2Stay? Card */}
+              <div className="f2s-side-card">
+                <h3 className="f2s-side-card-title">Why List on Find2Stay?</h3>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12.5px', color: '#334155' }}>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span>👥</span>
+                    <span>Reach thousands of verified tenants</span>
+                  </li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span>🛡️</span>
+                    <span>No brokerage hassle</span>
+                  </li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span>📈</span>
+                    <span>Easy listing &amp; management</span>
+                  </li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span>🔍</span>
+                    <span>Get direct enquiries</span>
+                  </li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--f2s-green)" strokeWidth="3">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>Trusted and verified platform</span>
+                  </li>
                 </ul>
               </div>
 
-              {/* Verified Verification Roadmap Card */}
-              <div
-                id="how-it-works-roadmap"
-                style={{
-                  background: '#f8fafc',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '20px',
-                  padding: '24px',
-                }}
-              >
-                <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 14px' }}>
-                  4-Step Verification Roadmap
-                </h4>
-                <div style={{ display: 'grid', gap: '14px', fontSize: '0.82rem', color: '#475569' }}>
-                  <div>
-                    <strong style={{ color: 'var(--navy)' }}>1. Submit Details</strong>
-                    <div>Provide rent, address, photos, and ownership declaration.</div>
-                  </div>
-                  <div>
-                    <strong style={{ color: 'var(--navy)' }}>2. Phone Authorization</strong>
-                    <div>Operations calls you within 24h to verify listing ownership.</div>
-                  </div>
-                  <div>
-                    <strong style={{ color: 'var(--navy)' }}>3. Field Verifier Visit</strong>
-                    <div>Our local team visits to inspect room condition, sub-meters, and RO water TDS.</div>
-                  </div>
-                  <div>
-                    <strong style={{ color: 'var(--navy)' }}>4. Verified QR Seal Activated</strong>
-                    <div>Listing goes live with the 180-day audit seal and instant booking QR code.</div>
+              {/* Listing Tips Card */}
+              <div className="f2s-side-card">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+                  <span style={{ fontSize: '18px' }}>💡</span>
+                  <h3 className="f2s-side-card-title" style={{ margin: 0 }}>Listing Tips</h3>
+                </div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', color: '#334155' }}>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--f2s-green)" strokeWidth="3">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>Upload clear and real photos</span>
+                  </li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--f2s-green)" strokeWidth="3">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>Add correct rent and details</span>
+                  </li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--f2s-green)" strokeWidth="3">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>Keep availability updated</span>
+                  </li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--f2s-green)" strokeWidth="3">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>Mention all amenities</span>
+                  </li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--f2s-green)" strokeWidth="3">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>Use video for better response</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Bulk Upload Card */}
+              <div className="f2s-side-card">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '20px' }}>🏢</span>
+                  <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--f2s-navy)' }}>
+                    Need to list multiple rooms?
                   </div>
                 </div>
+                <p style={{ fontSize: '11.5px', color: 'var(--f2s-text-muted)', lineHeight: 1.4, margin: '0 0 12px' }}>
+                  <strong>Bulk Upload:</strong> List multiple rooms at once using our bulk upload option.
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <a
+                    href="/api/owner/bulk-template"
+                    download
+                    className="f2s-btn-side-action outline"
+                  >
+                    <span>📥</span>
+                    <span>Download Template</span>
+                  </a>
+                  <BulkPropertyUploader />
+                </div>
               </div>
-            </div>
+
+              {/* Growth Promo Card */}
+              <div className="f2s-growth-poster-card">
+                <div className="f2s-growth-poster-header">
+                  <span className="f2s-poster-badge">EXCLUSIVE FOR OWNERS</span>
+                  <div className="f2s-growth-promo-title">
+                    List Today<br />Get Verified Tenants<br /><span style={{ color: 'var(--f2s-orange)' }}>Grow Your Rental Income</span>
+                  </div>
+                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/img/owner-sidebar-ad-pro.jpg"
+                  alt="List your property - Grow rental income"
+                  className="f2s-growth-poster-img"
+                />
+                <div className="f2s-poster-footer-stats">
+                  <div className="f2s-poster-stat-pill">⚡ Instant Inquiries</div>
+                  <div className="f2s-poster-stat-pill">🛡️ Zero Brokerage</div>
+                </div>
+              </div>
+            </aside>
           </div>
         )}
       </div>
@@ -1816,6 +1792,6 @@ export default function ListYourPropertyPage() {
           handleSubmit();
         }}
       />
-    </>
+    </div>
   );
 }

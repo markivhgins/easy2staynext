@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLocation } from '@/context/LocationContext';
 import { HeaderSavedButton } from './HeaderSavedButton';
-import { ServicesDropdown } from './ServicesDropdown';
 
 interface HeaderProps {
   user?: {
@@ -18,23 +17,34 @@ interface HeaderProps {
   } | null;
 }
 
-const NAV_LINKS_BEFORE = [
-  { href: '/pg', label: 'Find a Room' },
-  { href: '/flats', label: 'Flats' },
-];
+interface NavLinkItem {
+  href: string;
+  label: string;
+  hasChevron?: boolean;
+}
 
-const NAV_LINKS_AFTER = [
+const NAV_LINKS: NavLinkItem[] = [
+  { href: '/', label: 'Home' },
+  { href: '/pg', label: 'Find Stay', hasChevron: true },
+  { href: '/services/shifting', label: 'Shifting' },
+  { href: '/services/tiffin', label: 'Tiffin' },
+  { href: '/services/ro-water', label: 'RO Water' },
+  { href: '/blog', label: 'Blog' },
   { href: '/list-your-property', label: 'List Your Property' },
   { href: '/about', label: 'About Us' },
-  { href: '/blog', label: 'Blog' },
   { href: '/help', label: 'Help' },
 ];
 
 export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [findRoomDropdownOpen, setFindRoomDropdownOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(initialUser || null);
   const { city, setShowModal } = useLocation();
+
+  const findStayRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   const syncSession = useCallback(() => {
     fetch('/api/auth/me', { cache: 'no-store' })
@@ -49,10 +59,8 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
       .catch(() => {});
   }, []);
 
-  // Sync session on mount, on route changes, and on global auth change events
   useEffect(() => {
     syncSession();
-
     window.addEventListener('f2s-auth-change', syncSession);
     return () => {
       window.removeEventListener('f2s-auth-change', syncSession);
@@ -64,6 +72,25 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
       setCurrentUser(initialUser);
     }
   }, [initialUser]);
+
+  // Close dropdowns on outside mousedown or touch
+  useEffect(() => {
+    const handleOutsidePointer = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as Node;
+      if (userMenuRef.current && !userMenuRef.current.contains(target)) {
+        setUserDropdownOpen(false);
+      }
+      if (findStayRef.current && !findStayRef.current.contains(target)) {
+        setFindRoomDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsidePointer);
+    document.addEventListener('touchstart', handleOutsidePointer);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsidePointer);
+      document.removeEventListener('touchstart', handleOutsidePointer);
+    };
+  }, []);
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
@@ -94,288 +121,417 @@ export const Header: React.FC<HeaderProps> = ({ user: initialUser }) => {
     currentUser?.roles?.includes('OWNER');
 
   return (
-    <header>
-      <Link className="logo" href="/" aria-label="Find2Stay home">
+    <header className="f2s-header">
+      {/* Brand Logo with Tagline */}
+      <Link className="f2s-logo-wrap" href="/" aria-label="Find2Stay home">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/img/logo-icon.png" alt="" width={44} height={44} />
-        <span>
-          Find<b>2</b>Stay
-        </span>
+        <img src="/img/logo-icon.png" alt="Find2Stay" width={38} height={38} className="f2s-logo-icon" />
+        <div className="f2s-logo-texts">
+          <div className="f2s-logo-title">
+            Find<span>2</span>Stay
+          </div>
+          <span className="f2s-logo-tagline">Your Journey Begins with the Right Stay</span>
+        </div>
       </Link>
 
-      <nav
-        id="mainnav"
-        aria-label="Main"
-        className={mobileMenuOpen ? 'open' : ''}
-      >
-        {/* Mobile City Selector Pill inside drawer only — hidden on desktop */}
+      {/* Desktop & Mobile Main Nav */}
+      <nav id="mainnav" aria-label="Main" className={mobileMenuOpen ? 'open' : ''}>
+        {NAV_LINKS.map((link) => {
+          if (link.hasChevron) {
+            return (
+              <div
+                key={link.href}
+                ref={findStayRef}
+                className={`f2s-nav-dropdown-wrap ${findRoomDropdownOpen ? 'is-open' : ''}`}
+              >
+                <button
+                  type="button"
+                  className={`f2s-nav-link f2s-nav-btn ${isActive(link.href) ? 'on' : ''}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setFindRoomDropdownOpen((prev) => !prev);
+                  }}
+                  aria-expanded={findRoomDropdownOpen}
+                  aria-haspopup="true"
+                >
+                  <span>{link.label}</span>
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="12"
+                    height="12"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    className={`f2s-nav-chevron ${findRoomDropdownOpen ? 'open' : ''}`}
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+
+                <div className="f2s-findroom-dropdown-menu">
+                    <div className="f2s-dropdown-section-title">CATEGORIES</div>
+                    <Link
+                      href="/pg"
+                      className="f2s-dropdown-item"
+                      onClick={() => {
+                        setFindRoomDropdownOpen(false);
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      <span className="f2s-item-icon">🏠</span>
+                      <div>
+                        <b>All Verified Stays</b>
+                        <small>Explore all rooms, flats &amp; PGs</small>
+                      </div>
+                    </Link>
+                    <Link
+                      href="/pg?gender=boys"
+                      className="f2s-dropdown-item"
+                      onClick={() => {
+                        setFindRoomDropdownOpen(false);
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      <span className="f2s-item-icon">👨</span>
+                      <div>
+                        <b>Boys PG &amp; Hostels</b>
+                        <small>Student &amp; executive stays</small>
+                      </div>
+                    </Link>
+                    <Link
+                      href="/pg?gender=girls"
+                      className="f2s-dropdown-item"
+                      onClick={() => {
+                        setFindRoomDropdownOpen(false);
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      <span className="f2s-item-icon">👩</span>
+                      <div>
+                        <b>Girls PG &amp; Hostels</b>
+                        <small>Safe, gated &amp; warden verified</small>
+                      </div>
+                    </Link>
+                    <Link
+                      href="/pg?type=Flat"
+                      className="f2s-dropdown-item"
+                      onClick={() => {
+                        setFindRoomDropdownOpen(false);
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      <span className="f2s-item-icon">🏢</span>
+                      <div>
+                        <b>Independent Flats (1BHK / 2BHK)</b>
+                        <small>Full apartments with zero brokerage</small>
+                      </div>
+                    </Link>
+                    <Link
+                      href="/pg?sharing=Double"
+                      className="f2s-dropdown-item"
+                      onClick={() => {
+                        setFindRoomDropdownOpen(false);
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      <span className="f2s-item-icon">👥</span>
+                      <div>
+                        <b>Shared Rooms &amp; Co-Living</b>
+                        <small>Budget friendly sharing rooms</small>
+                      </div>
+                    </Link>
+
+                    <div className="f2s-dropdown-divider" />
+                    <div className="f2s-dropdown-section-title">POPULAR HUBS</div>
+                    <div className="f2s-dropdown-hubs-grid">
+                      <Link
+                        href="/pg?q=Sector+62"
+                        className="f2s-hub-chip"
+                        onClick={() => {
+                          setFindRoomDropdownOpen(false);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        📍 Sector 62 (Noida)
+                      </Link>
+                      <Link
+                        href="/pg?q=Knowledge+Park"
+                        className="f2s-hub-chip"
+                        onClick={() => {
+                          setFindRoomDropdownOpen(false);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        📍 Knowledge Park
+                      </Link>
+                      <Link
+                        href="/pg?q=Sector+15"
+                        className="f2s-hub-chip"
+                        onClick={() => {
+                          setFindRoomDropdownOpen(false);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        📍 Sector 15 (Metro)
+                      </Link>
+                      <Link
+                        href="/pg?q=Botanical+Garden"
+                        className="f2s-hub-chip"
+                        onClick={() => {
+                          setFindRoomDropdownOpen(false);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        📍 Botanical Garden
+                      </Link>
+                    </div>
+                  </div>
+              </div>
+            );
+          }
+
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`f2s-nav-link ${isActive(link.href) ? 'on' : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <span>{link.label}</span>
+            </Link>
+          );
+        })}
+
+        {/* Mobile-Only Drawer Actions */}
+        <div className="mobile-only-drawer-actions">
+          {isOps && (
+            <Link
+              href="/admin"
+              className="mobile-drawer-pill admin-pill"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              🛡️ Admin Desk
+            </Link>
+          )}
+
+          {isOwner && !isOps && (
+            <Link
+              href="/owner"
+              className="mobile-drawer-pill owner-pill"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              🏡 Owner Desk
+            </Link>
+          )}
+
+          {currentUser && !isOps ? (
+            <div className="mobile-drawer-user-row">
+              <Link
+                href={isOwner ? '/owner' : '/account/activity'}
+                className="mobile-drawer-user-link"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                👤 {currentUser.name || currentUser.phone || 'My Account'}
+              </Link>
+              <button
+                type="button"
+                className="mobile-drawer-logout"
+                onClick={(e) => {
+                  setMobileMenuOpen(false);
+                  handleLogout(e);
+                }}
+              >
+                Sign out
+              </button>
+            </div>
+          ) : !currentUser ? (
+            <div className="mobile-drawer-auth-buttons">
+              <Link
+                href="/auth"
+                className="f2s-btn-login"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Login
+              </Link>
+              <div style={{ fontSize: '11px', color: '#64748b', textAlign: 'center', marginTop: '6px' }}>
+                New user? Logging in creates your account automatically.
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </nav>
+
+      {/* Header Right Action Group */}
+      <div className="f2s-header-right">
+        {/* City Selector Pill with Pin & Chevron */}
         <button
           type="button"
-          onClick={() => {
-            setMobileMenuOpen(false);
-            setShowModal(true);
-          }}
-          className="cityp mobile-only-city"
-          style={{
-            margin: '0 0 12px 0',
-            width: '100%',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            background: '#f8fafc',
-          }}
+          className="cityp"
+          onClick={() => setShowModal(true)}
+          title={`Active city: ${city.name}. Click to change.`}
         >
           <svg
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            aria-hidden="true"
+            className="cityp-pin"
           >
             <path d="M12 22s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z" />
             <circle cx="12" cy="10" r="2.5" />
           </svg>
-          <span>City: {city.name} (Change)</span>
+          <span className="cityp-text">{city.name}</span>
+          <svg
+            viewBox="0 0 24 24"
+            width="12"
+            height="12"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            className="cityp-chevron"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </button>
 
-        {NAV_LINKS_BEFORE.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={isActive(link.href) ? 'on' : ''}
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            {link.label}
-          </Link>
-        ))}
+        {/* Wishlist Shortcut Button */}
+        <HeaderSavedButton />
 
-        {/* Grouped Services Tab with Dropdown */}
-        <div className="desktop-only-services">
-          <ServicesDropdown isMobile={false} onNavigate={() => setMobileMenuOpen(false)} />
-        </div>
-        <div className="mobile-only-services">
-          <ServicesDropdown isMobile={true} onNavigate={() => setMobileMenuOpen(false)} />
-        </div>
-
-        {NAV_LINKS_AFTER.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={isActive(link.href) ? 'on' : ''}
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            {link.label}
-          </Link>
-        ))}
-
-        {/* Mobile drawer shortcuts only */}
-        {isOps && (
+        {/* Logged in Desk & Profile Buttons */}
+        {isOps ? (
           <Link
             href="/admin"
-            className="mobile-only-city"
-            onClick={() => setMobileMenuOpen(false)}
-            style={{
-              padding: '10px 14px',
-              borderRadius: '8px',
-              background: '#0f172a',
-              color: '#38bdf8',
-              fontWeight: 700,
-              fontSize: '13px',
-              textDecoration: 'none',
-              margin: '8px 0',
-            }}
+            className="f2s-desk-pill admin"
+            title="Operations & Verification Desk"
           >
-            🛡️ Operations Desk
+            <span>🛡️</span>
+            <span>Admin Desk</span>
           </Link>
-        )}
-
-        {isOwner && !isOps && (
+        ) : isOwner ? (
           <Link
             href="/owner"
-            className="mobile-only-city"
-            onClick={() => setMobileMenuOpen(false)}
-            style={{
-              padding: '10px 14px',
-              borderRadius: '8px',
-              background: '#eff6ff',
-              color: '#1d4ed8',
-              fontWeight: 700,
-              fontSize: '13px',
-              textDecoration: 'none',
-              margin: '8px 0',
-            }}
+            className="f2s-desk-pill owner"
+            title="Owner Property Management"
           >
-            🏡 Owner Workspace
+            <span>🏡</span>
+            <span>Owner Desk</span>
           </Link>
-        )}
+        ) : null}
 
-        {currentUser ? (
-          <a
-            className="navso"
-            href="/api/auth/logout"
-            onClick={(e) => {
-              setMobileMenuOpen(false);
-              handleLogout(e);
-            }}
-          >
-            Sign out
-          </a>
-        ) : (
-          <Link
-            href="/auth"
-            className="navso"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Login / Sign in
-          </Link>
-        )}
-      </nav>
+        {currentUser && !isOps ? (
+          <div className="f2s-auth-logged-group">
+            {/* Interactive User Account Dropdown */}
+            <div ref={userMenuRef} className="f2s-user-menu-container">
+              <button
+                type="button"
+                className="f2s-user-pill-btn"
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                aria-expanded={userDropdownOpen}
+              >
+                <span className="f2s-user-avatar-icon">👤</span>
+                <span className="f2s-user-name-text">
+                  {currentUser.name || currentUser.phone || 'My Account'}
+                </span>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="11"
+                  height="11"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  className={`f2s-user-chevron ${userDropdownOpen ? 'open' : ''}`}
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
 
-      {/* Single Dynamic City Switcher */}
-      <button
-        type="button"
-        className="cityp"
-        onClick={() => setShowModal(true)}
-        title={`Current city: ${city.name}. Click to switch city or detect GPS location.`}
-        style={{
-          cursor: 'pointer',
-          background: '#ffffff',
-          fontFamily: 'inherit',
-          flexShrink: 0,
-        }}
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
+              {userDropdownOpen && (
+                <div className="f2s-user-dropdown-menu">
+                  <div className="f2s-user-dropdown-header">
+                    <div className="f2s-user-dropdown-name">{currentUser.name || 'User'}</div>
+                    <div className="f2s-user-dropdown-phone">
+                      {currentUser.phone ? `+91 ${currentUser.phone}` : 'Verified Member'}
+                    </div>
+                  </div>
+
+                  <div className="f2s-user-dropdown-divider" />
+
+                  <Link
+                    href={isOwner ? '/owner' : '/account/activity'}
+                    className="f2s-user-dropdown-item"
+                    onClick={() => setUserDropdownOpen(false)}
+                  >
+                    <span>📋</span>
+                    <span>My Activity &amp; Bookings</span>
+                  </Link>
+
+                  {isOwner && (
+                    <Link
+                      href="/owner"
+                      className="f2s-user-dropdown-item"
+                      onClick={() => setUserDropdownOpen(false)}
+                    >
+                      <span>🏡</span>
+                      <span>Owner Dashboard</span>
+                    </Link>
+                  )}
+
+                  <Link
+                    href="/list-your-property"
+                    className="f2s-user-dropdown-item"
+                    onClick={() => setUserDropdownOpen(false)}
+                  >
+                    <span>➕</span>
+                    <span>List Your Property</span>
+                  </Link>
+
+                  <div className="f2s-user-dropdown-divider" />
+
+                  <button
+                    type="button"
+                    className="f2s-user-dropdown-item logout-btn"
+                    onClick={handleLogout}
+                  >
+                    <span>🚪</span>
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : !currentUser ? (
+          <div className="f2s-auth-guest-group">
+            <Link 
+              href="/auth" 
+              className="f2s-btn-login"
+              title="Login with Mobile OTP (creates an account if you don't have one)"
+            >
+              Login
+            </Link>
+          </div>
+        ) : null}
+
+        {/* Mobile Hamburger Menu Toggle */}
+        <button
+          type="button"
+          className="nt"
+          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mainnav"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
-          <path d="M12 22s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z" />
-          <circle cx="12" cy="10" r="2.5" />
-        </svg>
-        <span>{city.name}</span>
-        <svg
-          viewBox="0 0 24 24"
-          width="12"
-          height="12"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          style={{ opacity: 0.65, marginLeft: '2px' }}
-        >
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
-      </button>
-
-      {/* Saved Listings / Wishlist Shortcut */}
-      <HeaderSavedButton />
-
-      {/* Desktop Owner Workspace Shortcut for Owners (Only for actual owners, not admins) */}
-      {isOwner && !isOps && (
-        <Link
-          href="/owner"
-          style={{
-            padding: '6px 12px',
-            borderRadius: '999px',
-            background: '#ecfdf5',
-            border: '1.5px solid #a7f3d0',
-            color: '#065f46',
-            fontWeight: 700,
-            fontSize: '12px',
-            textDecoration: 'none',
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
-          }}
-          title="Open Landlord Property Workspace"
-        >
-          🏡 Owner Desk
-        </Link>
-      )}
-
-      {/* Authoritative Desk Button: Admin gets dedicated Operations Desk; Tenants get Activity; Guests get Login */}
-      {isOps ? (
-        <Link
-          href="/admin"
-          title="Operations Desk: Verifications, Audits & Platform Queues"
-          style={{
-            flexShrink: 0,
-            padding: '6px 13px',
-            borderRadius: '8px',
-            background: '#0f172a',
-            border: '1px solid #1e293b',
-            color: '#38bdf8',
-            fontWeight: 700,
-            fontSize: '12px',
-            textDecoration: 'none',
-            whiteSpace: 'nowrap',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-          }}
-        >
-          <span>🛡️</span>
-          <span>Admin Desk</span>
-        </Link>
-      ) : currentUser ? (
-        <Link
-          className="me"
-          href={isOwner ? '/owner' : '/account/activity'}
-          title="My Activity, Rented Stays & Requests"
-          style={{
-            flexShrink: 0,
-            maxWidth: '135px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          👤 {currentUser.name || currentUser.phone || 'My Account'}
-        </Link>
-      ) : (
-        <Link className="me" href="/auth" style={{ flexShrink: 0 }}>
-          Login
-        </Link>
-      )}
-
-      {currentUser && (
-        <a
-          className="so"
-          href="/api/auth/logout"
-          onClick={handleLogout}
-          title="Sign out of account"
-          style={{
-            flexShrink: 0,
-            whiteSpace: 'nowrap',
-            padding: '6px 11px',
-            borderRadius: '8px',
-            background: '#fef2f2',
-            border: '1px solid #fecaca',
-            color: '#dc2626',
-            fontWeight: 700,
-            fontSize: '12px',
-            display: 'inline-block',
-          }}
-        >
-          Sign out
-        </a>
-      )}
-
-      <button
-        type="button"
-        className="nt"
-        aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-        aria-expanded={mobileMenuOpen}
-        aria-controls="mainnav"
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-      >
-        <span />
-        <span />
-        <span />
-      </button>
+          <span />
+          <span />
+          <span />
+        </button>
+      </div>
     </header>
   );
 };
+
+export default Header;
+
+

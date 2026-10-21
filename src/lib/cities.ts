@@ -226,6 +226,14 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
  * Finds closest supported city to coordinates
  */
 export function findNearestCity(lat: number, lng: number): CityInfo {
+  return findNearestCityWithDistance(lat, lng).city;
+}
+
+export function findNearestCityWithDistance(lat: number, lng: number): {
+  city: CityInfo;
+  distanceKm: number;
+  isServiceable: boolean;
+} {
   let bestMatch = SUPPORTED_CITIES[0];
   let minDistance = Infinity;
 
@@ -237,5 +245,12 @@ export function findNearestCity(lat: number, lng: number): CityInfo {
     }
   }
 
-  return bestMatch;
+  // Maximum radius for local service coverage is 65km from city center
+  const isServiceable = minDistance <= 65;
+
+  return {
+    city: bestMatch,
+    distanceKm: Math.round(minDistance),
+    isServiceable,
+  };
 }

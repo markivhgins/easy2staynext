@@ -327,8 +327,38 @@ export function PlaceAutocompleteInput({
           </div>
 
           {filtered.length === 0 ? (
-            <div style={{ padding: '14px 12px', fontSize: '13px', color: 'var(--mut, #51618A)', textAlign: 'center' }}>
-              No exact match for &quot;<strong>{query}</strong>&quot;. Press Search to discover all stays.
+            <div style={{ padding: '16px 14px', background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: '12px', margin: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#9f1239', fontWeight: 700, fontSize: '13.5px', marginBottom: '4px' }}>
+                <span>⚠️</span>
+                <span>Area Not Covered Yet</span>
+              </div>
+              <div style={{ fontSize: '12.5px', color: '#be123c', lineHeight: 1.45, marginBottom: '10px' }}>
+                Find2Stay verified stays and relocation services are not yet available in &quot;<strong>{query}</strong>&quot;. We currently operate in <strong>Noida</strong>, <strong>Greater Noida</strong>, <strong>Delhi NCR</strong>, <strong>Gurugram</strong>, and <strong>Ghaziabad</strong>.
+              </div>
+              <div style={{ fontSize: '11.5px', color: '#475569', fontWeight: 600, marginBottom: '6px' }}>EXPLORE ACTIVE HUBS INSTEAD:</div>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => handleSelect({ id: 'quick-noida', name: 'Sector 62 (Noida)', sub: 'IT Park & Student Hub', category: 'locality', queryValue: 'Sector 62' })}
+                  style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '5px 9px', fontSize: '11.5px', fontWeight: 600, color: '#075CE5', cursor: 'pointer' }}
+                >
+                  📍 Sector 62, Noida
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSelect({ id: 'quick-kp', name: 'Knowledge Park (Greater Noida)', sub: 'Premier College Hub', category: 'locality', queryValue: 'Knowledge Park' })}
+                  style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '5px 9px', fontSize: '11.5px', fontWeight: 600, color: '#075CE5', cursor: 'pointer' }}
+                >
+                  📍 Knowledge Park, Gr. Noida
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSelect({ id: 'quick-delhi', name: 'North Campus (Delhi University)', sub: 'Colleges & Hostels', category: 'locality', queryValue: 'North Campus' })}
+                  style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '5px 9px', fontSize: '11.5px', fontWeight: 600, color: '#075CE5', cursor: 'pointer' }}
+                >
+                  📍 North Campus, Delhi
+                </button>
+              </div>
             </div>
           ) : (
             filtered.map((item, index) => {

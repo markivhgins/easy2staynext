@@ -1,381 +1,216 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { PlaceAutocompleteInput } from './PlaceAutocompleteInput';
 import { useLocation } from '@/context/LocationContext';
 
-type SearchCategory = 'pg' | 'flats' | 'society';
+type TabType = 'rooms' | 'shifting' | 'tiffin' | 'water';
 
 export function HeroSearchBar() {
-  const [category, setCategory] = useState<SearchCategory>('pg');
-  const [selectedMax, setSelectedMax] = useState('');
-  const [budgetOpen, setBudgetOpen] = useState(false);
-  const budgetDropdownRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState<TabType>('rooms');
+  const { city, setShowModal } = useLocation();
 
-  const { city } = useLocation();
-
-  const actionPath = category === 'pg' ? '/pg' : category === 'flats' ? '/flats' : '/society';
-
-  const firstLocality = city.localities[0]?.name || 'Sector 62';
-  const secondLocality = city.localities[1]?.name || 'Sector 126';
-
-  const placeholders: Record<SearchCategory, string> = {
-    pg: `Search SRM, Amity, JSS, Sector 62, single room...`,
-    flats: `Search 1 BHK, 2 BHK in ${city.name}...`,
-    society: `Search societies & gated enclaves in ${city.name}...`,
+  const tabConfig = {
+    rooms: {
+      action: '/pg',
+      placeholder: 'Search PG, Flat, Room near you...',
+      buttonText: 'Search',
+      chips: [
+        { label: 'PG for Boys', href: '/pg?gender=boys' },
+        { label: 'PG for Girls', href: '/pg?gender=girls' },
+        { label: '1 BHK', href: '/flats?bhk=1+BHK' },
+        { label: 'Near Metro', href: '/pg?q=Metro' },
+        { label: 'Near College', href: '/pg?q=College' },
+        { label: 'Shared Room', href: '/pg?occupancy=double' },
+        { label: 'Furnished Room', href: '/pg?furnishing=furnished' },
+      ],
+    },
+    shifting: {
+      action: '/services/shifting',
+      placeholder: 'Where do you want to shift? Enter pickup or drop...',
+      buttonText: 'Search',
+      chips: [
+        { label: '1 BHK Shifting', href: '/services/shifting?type=1bhk' },
+        { label: 'Room Shifting', href: '/services/shifting?type=room' },
+        { label: 'Local Within City', href: '/services/shifting?scope=local' },
+        { label: 'Hassle-free Movers', href: '/services/shifting' },
+      ],
+    },
+    tiffin: {
+      action: '/services/tiffin',
+      placeholder: 'Find pure home-style tiffin delivery near you...',
+      buttonText: 'Search',
+      chips: [
+        { label: 'North Indian Thali', href: '/services/tiffin?meal=north-indian' },
+        { label: 'Healthy & Tasty', href: '/services/tiffin?diet=healthy' },
+        { label: 'Monthly Meal Plan', href: '/services/tiffin?plan=monthly' },
+        { label: 'Student Discount', href: '/services/tiffin' },
+      ],
+    },
+    water: {
+      action: '/services/ro-water',
+      placeholder: 'Order clean 20L RO water cans at your doorstep...',
+      buttonText: 'Search',
+      chips: [
+        { label: '20L Daily Can', href: '/services/ro-water?type=20l' },
+        { label: 'Clean & Safe Water', href: '/services/ro-water?filter=ro' },
+        { label: 'Monthly Pass', href: '/services/ro-water?plan=monthly' },
+        { label: 'Quick Delivery', href: '/services/ro-water' },
+      ],
+    },
   };
 
-  const budgetOptions: Record<SearchCategory, Array<{ value: string; label: string }>> = {
-    pg: [
-      { value: '', label: 'Any budget' },
-      { value: '4000', label: 'Up to ₹4,000' },
-      { value: '6000', label: 'Up to ₹6,000' },
-      { value: '8000', label: 'Up to ₹8,000' },
-      { value: '12000', label: 'Up to ₹12,000' },
-    ],
-    flats: [
-      { value: '', label: 'Any budget' },
-      { value: '10000', label: 'Up to ₹10,000' },
-      { value: '15000', label: 'Up to ₹15,000' },
-      { value: '25000', label: 'Up to ₹25,000' },
-      { value: '40000', label: 'Up to ₹40,000' },
-    ],
-    society: [
-      { value: '', label: 'Any budget' },
-      { value: '15000', label: 'Up to ₹15,000' },
-      { value: '20000', label: 'Up to ₹20,000' },
-      { value: '30000', label: 'Up to ₹30,000' },
-      { value: '50000', label: 'Above ₹30,000' },
-    ],
-  };
-
-  // Close budget dropdown on outside click or escape
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent | TouchEvent) {
-      if (budgetDropdownRef.current && !budgetDropdownRef.current.contains(e.target as Node)) {
-        setBudgetOpen(false);
-      }
-    }
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') setBudgetOpen(false);
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('touchstart', handleClickOutside);
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-
-  const currentBudgetLabel =
-    budgetOptions[category].find((b) => b.value === selectedMax)?.label || 'Any budget';
+  const currentConfig = tabConfig[activeTab];
 
   return (
-    <div className="wrap">
-      <form id="hs" className="h2s" action={actionPath} method="GET">
-        {/* Category Tabs */}
-        <div className="h2tabs">
-          <label>
-            <input
-              type="radio"
-              name="cat"
-              value="pg"
-              checked={category === 'pg'}
-              onChange={() => {
-                setCategory('pg');
-                setSelectedMax('');
-              }}
-            />
-            <span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 18v-7a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v7M3 15h18M6 8V5h12v3" />
-              </svg>
-              PG / Room
-            </span>
-          </label>
+    <div className="f2s-search-wrapper">
+      <form id="hs" className="f2s-search-box" action={currentConfig.action} method="GET">
+        {/* 4 Category Tabs */}
+        <div className="f2s-search-tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'rooms'}
+            className={`f2s-tab-btn ${activeTab === 'rooms' ? 'active' : ''}`}
+            onClick={() => setActiveTab('rooms')}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10z" />
+            </svg>
+            <span>Rooms</span>
+          </button>
 
-          <label>
-            <input
-              type="radio"
-              name="cat"
-              value="flats"
-              checked={category === 'flats'}
-              onChange={() => {
-                setCategory('flats');
-                setSelectedMax('');
-              }}
-            />
-            <span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M4 21V4h10v17M14 9h6v12M8 8h2M8 12h2M8 16h2" />
-              </svg>
-              1 / 2 BHK Flat
-            </span>
-          </label>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'shifting'}
+            className={`f2s-tab-btn ${activeTab === 'shifting' ? 'active' : ''}`}
+            onClick={() => setActiveTab('shifting')}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <rect x="1" y="3" width="15" height="13" rx="1" />
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+              <circle cx="5.5" cy="18.5" r="2.5" />
+              <circle cx="18.5" cy="18.5" r="2.5" />
+            </svg>
+            <span>Shifting</span>
+          </button>
 
-          <label>
-            <input
-              type="radio"
-              name="cat"
-              value="society"
-              checked={category === 'society'}
-              onChange={() => {
-                setCategory('society');
-                setSelectedMax('');
-              }}
-            />
-            <span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="2" y="7" width="20" height="14" rx="2" />
-                <path d="M12 7V3M7 3h10" />
-              </svg>
-              Society Flat
-            </span>
-          </label>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'tiffin'}
+            className={`f2s-tab-btn ${activeTab === 'tiffin' ? 'active' : ''}`}
+            onClick={() => setActiveTab('tiffin')}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <path d="M12 2a3 3 0 0 0-3 3v1H5a2 2 0 0 0-2 2v2a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a2 2 0 0 0-2-2h-4V5a3 3 0 0 0-3-3z" />
+              <path d="M4 11v8a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-8" />
+              <line x1="12" y1="6" x2="12" y2="22" />
+            </svg>
+            <span>Tiffin</span>
+          </button>
+
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'water'}
+            className={`f2s-tab-btn ${activeTab === 'water' ? 'active' : ''}`}
+            onClick={() => setActiveTab('water')}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+            </svg>
+            <span>RO Water</span>
+          </button>
         </div>
 
-        {/* Hidden input to submit budget value with form */}
-        <input type="hidden" name="max" value={selectedMax} />
-
-        {/* Input Bar */}
-        <div className="h2bar">
-          <label className="h2f" style={{ cursor: 'text' }}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        {/* Input Bar with Search, City Selector & Orange Submit Button */}
+        <div className="f2s-search-bar">
+          <div className="f2s-search-input-field">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="f2s-input-icon"
+            >
               <circle cx="11" cy="11" r="7" />
               <path d="M20 20l-4-4" />
             </svg>
             <PlaceAutocompleteInput
               name="q"
-              placeholder={placeholders[category]}
-              ariaLabel={`Search ${city.name} locality, SRM, Amity or stay type`}
+              placeholder={currentConfig.placeholder}
+              ariaLabel={currentConfig.placeholder}
             />
-          </label>
+          </div>
 
-          {/* Custom Budget Selector with Official Rupee Icon (Matches Map Dropdown UI) */}
-          <div
-            ref={budgetDropdownRef}
-            className="h2f h2b custom-budget-select-wrapper"
-            style={{
-              position: 'relative',
-              cursor: 'pointer',
-              userSelect: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '8px',
-            }}
-            onClick={() => setBudgetOpen(!budgetOpen)}
-            role="combobox"
-            aria-expanded={budgetOpen}
-            aria-haspopup="listbox"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setBudgetOpen(!budgetOpen);
-              }
-            }}
+          {/* City Selector embedded in search bar */}
+          <button
+            type="button"
+            className="f2s-search-city-btn"
+            onClick={() => setShowModal(true)}
+            title="Switch search city"
           >
-            {/* Indian Rupee ₹ Symbol */}
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 800,
-                fontSize: '17px',
-                color: 'var(--bl)',
-                width: '18px',
-                height: '18px',
-                lineHeight: 1,
-                fontFamily: 'Inter, system-ui, sans-serif',
-                flexShrink: 0,
-              }}
-              aria-hidden="true"
-            >
-              ₹
-            </span>
-
-            <span
-              style={{
-                flex: 1,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                fontSize: '14.5px',
-                fontWeight: 600,
-                color: 'var(--nv)',
-              }}
-            >
-              {currentBudgetLabel}
-            </span>
-
-            {/* Down Chevron */}
             <svg
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2.5"
+              strokeWidth="2.2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              style={{
-                width: '14px',
-                height: '14px',
-                color: 'var(--mut)',
-                transform: budgetOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                flexShrink: 0,
-              }}
+              className="f2s-city-pin"
+            >
+              <path d="M12 22s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z" />
+              <circle cx="12" cy="10" r="2.5" />
+            </svg>
+            <span className="f2s-city-name">{city.name}</span>
+            <svg
+              viewBox="0 0 24 24"
+              width="13"
+              height="13"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              className="f2s-city-chevron"
             >
               <polyline points="6 9 12 15 18 9" />
             </svg>
+          </button>
 
-            {/* Custom Dropdown Menu matching City & Map Selection UI */}
-            {budgetOpen && (
-              <div
-                className="f2s-budget-menu-popup"
-                role="listbox"
-                style={{
-                  position: 'absolute',
-                  top: 'calc(100% + 8px)',
-                  left: 0,
-                  right: 0,
-                  minWidth: '220px',
-                  background: '#ffffff',
-                  border: '1px solid var(--line, #dadfe8)',
-                  borderRadius: '16px',
-                  boxShadow: '0 20px 48px -10px rgba(7, 27, 75, 0.28), 0 0 0 1px rgba(7, 27, 75, 0.06)',
-                  padding: '6px',
-                  zIndex: 99999,
-                  animation: 'f2s-dropdown-fade 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div
-                  style={{
-                    padding: '6px 12px 4px',
-                    fontSize: '10.5px',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.06em',
-                    color: 'var(--mut)',
-                  }}
-                >
-                  Select Monthly Budget
-                </div>
-                {budgetOptions[category].map((opt) => {
-                  const isSelected = opt.value === selectedMax;
-                  return (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      role="option"
-                      aria-selected={isSelected}
-                      onClick={() => {
-                        setSelectedMax(opt.value);
-                        setBudgetOpen(false);
-                      }}
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '9px 12px',
-                        borderRadius: '10px',
-                        border: 'none',
-                        background: isSelected ? '#EEF4FF' : 'transparent',
-                        color: isSelected ? 'var(--bl)' : 'var(--nv)',
-                        fontWeight: isSelected ? 700 : 500,
-                        fontSize: '14px',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'background 0.15s ease',
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!isSelected) (e.currentTarget.style.background = '#F8FAFC');
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isSelected) (e.currentTarget.style.background = 'transparent');
-                      }}
-                    >
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span
-                          style={{
-                            color: isSelected ? 'var(--bl)' : 'var(--mut)',
-                            fontWeight: 700,
-                            fontSize: '13px',
-                          }}
-                        >
-                          ₹
-                        </span>
-                        {opt.label}
-                      </span>
-                      {isSelected && (
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.8"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          style={{ width: '16px', height: '16px', color: 'var(--bl)' }}
-                        >
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          <button type="submit" className="h2go" aria-label="Search verified stays">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          {/* Vibrant Orange Search Button */}
+          <button type="submit" className="f2s-search-submit-btn" aria-label="Search">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <circle cx="11" cy="11" r="7" />
               <path d="M20 20l-4-4" />
             </svg>
-            Search
+            <span>{currentConfig.buttonText}</span>
           </button>
         </div>
       </form>
 
-      {/* Popular Chips with SRM and major college corridors */}
-      <div className="h2chips">
-        {category === 'pg' && (
-          <>
-            <Link href="/pg?q=SRM">🎓 Near SRM (Modinagar)</Link>
-            <Link href="/pg?q=Amity">🎓 Near Amity</Link>
-            <Link href="/pg?q=Sector%2062">📍 Sec 62 (JSS / JIIT)</Link>
-            <Link href="/pg?q=Knowledge%20Park">🎓 Knowledge Park (Sharda/Galgotias)</Link>
-            <Link href="/pg?q=North%20Campus">🎓 DU North Campus</Link>
-            <Link href="/pg?gender=boys">PG for Boys</Link>
-            <Link href="/pg?gender=girls">PG for Girls</Link>
-            <Link href="/pg?occupancy=single">Single Room</Link>
-          </>
-        )}
-        {category === 'flats' && (
-          <>
-            <Link href="/flats?bhk=1+BHK">1 BHK Flat</Link>
-            <Link href="/flats?bhk=2+BHK">2 BHK Flat</Link>
-            <Link href="/flats?q=Sector%20137">Sector 137 (Expressway)</Link>
-            <Link href="/flats?q=Indirapuram">Indirapuram</Link>
-            <Link href="/flats?furnishing=furnished">Fully Furnished</Link>
-          </>
-        )}
-        {category === 'society' && (
-          <>
-            <Link href="/society">All Societies</Link>
-            <Link href="/society?q=Sector%2075">Sector 75 &amp; 76</Link>
-            <Link href="/society?q=Sector%20137">Sector 137 High-Rise</Link>
-            <Link href="/society?gated=true">Gated Security</Link>
-            <Link href="/flats">Independent Flats →</Link>
-          </>
-        )}
+      {/* Popular Searches Tag Row */}
+      <div className="f2s-popular-chips-wrap">
+        <span className="f2s-popular-label">Popular Searches:</span>
+        <div className="f2s-popular-chips">
+          {currentConfig.chips.map((chip) => (
+            <Link key={chip.label} href={chip.href} className="f2s-chip-pill">
+              {chip.label}
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
+

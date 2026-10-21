@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { CityInfo, SUPPORTED_CITIES, findNearestCity } from '@/lib/cities';
+import { CityInfo, SUPPORTED_CITIES, findNearestCity, findNearestCityWithDistance } from '@/lib/cities';
 
 interface LocationContextType {
   city: CityInfo;
@@ -97,11 +97,18 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const { latitude, longitude } = pos.coords;
-          const nearest = findNearestCity(latitude, longitude);
+          const { city: nearest, distanceKm, isServiceable } = findNearestCityWithDistance(latitude, longitude);
           setCity(nearest);
           setIsLocating(false);
           setShowModal(false);
-          setLocationMessage(`📍 GPS Location detected: ${nearest.name} (${nearest.state}). Updated nearby stays!`);
+
+          if (!isServiceable) {
+            setLocationMessage(
+              `⚠️ Location detected (~${distanceKm} km away). Find2Stay verified stays and relocation services are currently not active in your immediate area. Showing verified stays in our nearest active hub: ${nearest.name} (${nearest.state}).`
+            );
+          } else {
+            setLocationMessage(`📍 GPS Location confirmed: ${nearest.name} (${nearest.state}). Showing verified stays!`);
+          }
           resolve(nearest);
         },
         (err) => {
